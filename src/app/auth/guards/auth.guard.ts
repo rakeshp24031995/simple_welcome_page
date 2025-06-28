@@ -18,12 +18,18 @@ export const ownerGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  if (authService.isOwner()) {
+  // Check for specific owner role only (not admin)
+  if (authService.hasRole('owner')) {
     return true;
   }
 
   if (authService.isAuthenticated()) {
-    router.navigate(['/profile']);
+    // Redirect admin to admin dashboard
+    if (authService.isAdmin()) {
+      router.navigate(['/admin']);
+    } else {
+      router.navigate(['/profile']);
+    }
   } else {
     router.navigate(['/login']);
   }

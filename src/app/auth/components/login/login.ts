@@ -47,7 +47,9 @@ export class Login implements OnInit {
           this.isLoading = false;
           
           // Redirect based on user role
-          if (user.role === 'owner' || user.role === 'admin') {
+          if (user.role === 'admin') {
+            this.router.navigate(['/admin']);
+          } else if (user.role === 'owner') {
             this.router.navigate(['/dashboard']);
           } else {
             this.router.navigate([this.returnUrl]);
