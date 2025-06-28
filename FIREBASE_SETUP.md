@@ -1,4 +1,4 @@
-# Firebase Setup Guide for CleanCut Application
+# Firebase Setup Guide for Clean Cut Lounge Application
 
 ## 🔥 Firebase Configuration
 
@@ -6,7 +6,7 @@
 
 1. Go to [Firebase Console](https://console.firebase.google.com/)
 2. Click "Create a project" or "Add project"
-3. Enter project name: `cleancut-barbershop` (or your preferred name)
+3. Enter project name: `cleancutlounge-barbershop` (or your preferred name)
 4. Choose whether to enable Google Analytics (optional)
 5. Click "Create project"
 
@@ -36,7 +36,7 @@ Your Firebase will automatically create these collections when the app runs:
 1. Go to **Project Settings** (gear icon)
 2. Scroll down to "Your apps"
 3. Click "Add app" > Web app (</>) 
-4. Register your app with name: `CleanCut Web App`
+4. Register your app with name: `Clean Cut Lounge Web App`
 5. Copy the Firebase configuration object
 
 ### Step 6: Update Environment Files
@@ -114,7 +114,7 @@ service cloud.firestore {
 ## 🔐 Default Admin Account
 
 The application will automatically create an admin account:
-- **Email**: admin@cleancut.com
+- **Email**: admin@cleancutlounge.com
 - **Password**: admin123
 
 ## 🚀 Features Enabled with Firebase

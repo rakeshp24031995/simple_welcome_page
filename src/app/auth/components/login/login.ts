@@ -50,9 +50,9 @@ export class Login implements OnInit {
           if (user.role === 'admin') {
             this.router.navigate(['/admin']);
           } else if (user.role === 'owner') {
-            this.router.navigate(['/dashboard']);
+            this.router.navigate(['/owner-dashboard']);
           } else {
-            this.router.navigate([this.returnUrl]);
+            this.router.navigate(['/dashboard']);
           }
         },
         error: (error) => {

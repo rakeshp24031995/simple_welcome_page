@@ -27,8 +27,10 @@ export const ownerGuard: CanActivateFn = (route, state) => {
     // Redirect admin to admin dashboard
     if (authService.isAdmin()) {
       router.navigate(['/admin']);
+    } else if (authService.hasRole('owner')) {
+      router.navigate(['/owner-dashboard']);
     } else {
-      router.navigate(['/profile']);
+      router.navigate(['/dashboard']);
     }
   } else {
     router.navigate(['/login']);
@@ -45,10 +47,10 @@ export const adminGuard: CanActivateFn = (route, state) => {
   }
 
   if (authService.isAuthenticated()) {
-    if (authService.isOwner()) {
-      router.navigate(['/dashboard']);
+    if (authService.hasRole('owner')) {
+      router.navigate(['/owner-dashboard']);
     } else {
-      router.navigate(['/profile']);
+      router.navigate(['/dashboard']);
     }
   } else {
     router.navigate(['/login']);
@@ -67,10 +69,10 @@ export const guestGuard: CanActivateFn = (route, state) => {
   // Redirect authenticated users to their dashboard
   if (authService.isAdmin()) {
     router.navigate(['/admin']);
-  } else if (authService.isOwner()) {
-    router.navigate(['/dashboard']);
+  } else if (authService.hasRole('owner')) {
+    router.navigate(['/owner-dashboard']);
   } else {
-    router.navigate(['/profile']);
+    router.navigate(['/dashboard']);
   }
   return false;
 };

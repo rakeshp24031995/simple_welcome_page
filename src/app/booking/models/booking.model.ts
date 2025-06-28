@@ -5,6 +5,8 @@ export interface Booking {
   customerPhone: string;
   customerEmail: string;
   service: string;
+  barber?: string;
+  price?: number;
   date: string;
   time: string;
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled';

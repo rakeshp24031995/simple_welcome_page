@@ -1,0 +1,65 @@
+/* User Dashboard Specific Styles */
+.dashboard-card {
+  @apply bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300;
+}
+
+.stat-card {
+  @apply bg-white rounded-xl shadow-md p-6;
+}
+
+.booking-card {
+  @apply border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all duration-300 hover:border-gold;
+}
+
+.status-badge {
+  @apply px-3 py-1 rounded-full text-xs font-medium;
+}
+
+.action-button {
+  @apply w-full py-3 px-4 rounded-lg font-medium transition-colors duration-300 flex items-center justify-center;
+}
+
+.primary-action {
+  @apply bg-gold text-black hover:bg-yellow-500;
+}
+
+.secondary-action {
+  @apply bg-black text-white hover:bg-gray-800;
+}
+
+.outline-action {
+  @apply border-2 border-black text-black hover:bg-black hover:text-white;
+}
+
+/* Custom scrollbar for activity list */
+.activity-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.activity-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.activity-list::-webkit-scrollbar-thumb {
+  background: #d4af37;
+  border-radius: 10px;
+}
+
+.activity-list::-webkit-scrollbar-thumb:hover {
+  background: #b8941f;
+}
+
+/* Animation for loading state */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

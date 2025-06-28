@@ -19,7 +19,7 @@ import { AppInitService } from './core/services/app-init.service';
   styleUrl: './app.css'
 })
 export class App implements OnInit {
-  protected title = 'CleanCut - Premium Indian Barbershop';
+  protected title = 'Clean Cut Lounge - Premium Indian Barbershop';
   currentUser$: Observable<User | null>;
   showUserMenu = false;
   isHomePage = true;

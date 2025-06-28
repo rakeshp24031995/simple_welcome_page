@@ -17,7 +17,7 @@ export class Testimonials {
     },
     {
       name: 'Vikram Singh',
-      text: 'CleanCut is the best barbershop in Tumakuru! Professional service, great atmosphere, and reasonable prices. The champi was absolutely divine.',
+      text: 'Clean Cut Lounge is the best barbershop in Tumakuru! Professional service, great atmosphere, and reasonable prices. The champi was absolutely divine.',
       avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80',
       service: 'Champi & Haircut'
     },

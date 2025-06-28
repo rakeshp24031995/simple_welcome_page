@@ -19,11 +19,15 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-gradient-to-r from-gold to-yellow-500 text-dark font-semibold py-3 px-8 rounded-full transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+    @apply bg-gradient-to-r from-gold-500 to-gold-400 text-black font-semibold py-3 px-8 rounded-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:from-gold-600 hover:to-gold-500;
   }
   
   .btn-secondary {
-    @apply border-2 border-gold text-gold font-semibold py-3 px-8 rounded-full transition-all duration-300 hover:bg-gold hover:text-dark;
+    @apply border-2 border-gold text-gold font-semibold py-3 px-8 rounded-full transition-all duration-300 hover:bg-gold hover:text-black hover:shadow-lg;
+  }
+
+  .btn-dark {
+    @apply bg-gradient-to-r from-black to-black-light text-gold font-semibold py-3 px-8 rounded-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:from-black-medium hover:to-black;
   }
   
   .section-padding {
@@ -35,7 +39,19 @@
   }
   
   .card-hover {
-    @apply transition-all duration-300 hover:shadow-2xl hover:-translate-y-2;
+    @apply transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 hover:shadow-gold/20;
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-r from-gold to-gold-400 bg-clip-text text-transparent;
+  }
+
+  .bg-dark-gradient {
+    @apply bg-gradient-to-br from-black via-black-light to-black-medium;
+  }
+
+  .border-gradient {
+    @apply border-2 border-transparent bg-gradient-to-r from-gold to-gold-400 bg-clip-border;
   }
 }
 

@@ -203,7 +203,7 @@ export class AuthService {
   // Create admin user (should be called during app initialization)
   async createAdminUser(): Promise<void> {
     try {
-      const adminEmail = 'admin@cleancut.com';
+      const adminEmail = 'admin@cleancutlounge.com';
       const adminPassword = 'admin123';
       
       // Check if admin already exists in Firestore
