@@ -224,7 +224,7 @@ export class AuthService {
         const adminProfile = {
           displayName: 'System Administrator',
           email: adminEmail,
-          phoneNumber: '+91 98765 43210',
+          phoneNumber: '+91 9738352239',
           role: 'admin' as const,
           isActive: true
         };
