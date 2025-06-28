@@ -34,7 +34,23 @@ export class AuthService {
     // Simulate API call - replace with actual Firebase/backend call
     return new Observable(observer => {
       setTimeout(() => {
-        if (credentials.email === 'owner@cleancut.com' && credentials.password === 'password') {
+        if (credentials.email === 'admin@cleancut.com' && credentials.password === 'admin123') {
+          const user: User = {
+            uid: 'admin-001',
+            email: credentials.email,
+            displayName: 'System Administrator',
+            role: 'admin',
+            phoneNumber: '+91 98765 43210',
+            createdAt: new Date(),
+            isEmailVerified: true
+          };
+          
+          localStorage.setItem('cleancut_user', JSON.stringify(user));
+          this.currentUserSubject.next(user);
+          this.isLoadingSubject.next(false);
+          observer.next(user);
+          observer.complete();
+        } else if (credentials.email === 'owner@cleancut.com' && credentials.password === 'password') {
           const user: User = {
             uid: 'owner-123',
             email: credentials.email,
@@ -121,8 +137,23 @@ export class AuthService {
     return user?.role === 'owner' || user?.role === 'admin';
   }
 
+  isAdmin(): boolean {
+    const user = this.getCurrentUser();
+    return user?.role === 'admin';
+  }
+
   hasRole(role: string): boolean {
     const user = this.getCurrentUser();
     return user?.role === role;
+  }
+
+  hasAdminAccess(): boolean {
+    const user = this.getCurrentUser();
+    return user?.role === 'admin';
+  }
+
+  hasOwnerAccess(): boolean {
+    const user = this.getCurrentUser();
+    return user?.role === 'owner' || user?.role === 'admin';
   }
 }

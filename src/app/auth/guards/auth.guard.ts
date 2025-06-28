@@ -30,6 +30,26 @@ export const ownerGuard: CanActivateFn = (route, state) => {
   return false;
 };
 
+export const adminGuard: CanActivateFn = (route, state) => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+
+  if (authService.isAdmin()) {
+    return true;
+  }
+
+  if (authService.isAuthenticated()) {
+    if (authService.isOwner()) {
+      router.navigate(['/dashboard']);
+    } else {
+      router.navigate(['/profile']);
+    }
+  } else {
+    router.navigate(['/login']);
+  }
+  return false;
+};
+
 export const guestGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
@@ -39,7 +59,9 @@ export const guestGuard: CanActivateFn = (route, state) => {
   }
 
   // Redirect authenticated users to their dashboard
-  if (authService.isOwner()) {
+  if (authService.isAdmin()) {
+    router.navigate(['/admin']);
+  } else if (authService.isOwner()) {
     router.navigate(['/dashboard']);
   } else {
     router.navigate(['/profile']);

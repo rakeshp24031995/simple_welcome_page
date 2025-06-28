@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard, ownerGuard, guestGuard } from './auth/guards/auth.guard';
+import { authGuard, ownerGuard, guestGuard, adminGuard } from './auth/guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -35,6 +35,11 @@ export const routes: Routes = [
     path: 'dashboard',
     canActivate: [ownerGuard],
     loadComponent: () => import('./dashboard/components/owner-dashboard/owner-dashboard').then(m => m.OwnerDashboard)
+  },
+  {
+    path: 'admin',
+    canActivate: [adminGuard],
+    loadComponent: () => import('./admin/components/admin-dashboard/admin-dashboard').then(m => m.AdminDashboard)
   },
   {
     path: '**',
