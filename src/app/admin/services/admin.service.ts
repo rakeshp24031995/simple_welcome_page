@@ -1,7 +1,10 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable, of, from } from 'rxjs';
+import { map, catchError, switchMap } from 'rxjs/operators';
 import { CreateOwnerData, AdminStats, UserManagement } from '../models/admin.model';
 import { User } from '../../auth/models/user.model';
+import { FirebaseService } from '../../core/services/firebase.service';
+import { AuthService } from '../../auth/services/auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,155 +13,173 @@ export class AdminService {
   private usersSubject = new BehaviorSubject<UserManagement[]>([]);
   public users$ = this.usersSubject.asObservable();
 
-  private readonly USERS_STORAGE_KEY = 'cleancut_all_users';
-
-  constructor() {
+  constructor(
+    private firebaseService: FirebaseService,
+    private authService: AuthService
+  ) {
     this.loadUsers();
   }
 
   private loadUsers(): void {
-    const stored = localStorage.getItem(this.USERS_STORAGE_KEY);
-    if (stored) {
-      try {
-        const users = JSON.parse(stored);
-        this.usersSubject.next(users);
-      } catch (error) {
-        console.error('Error loading users:', error);
-        this.initializeDefaultUsers();
-      }
-    } else {
-      this.initializeDefaultUsers();
-    }
-  }
-
-  private initializeDefaultUsers(): void {
-    const defaultUsers: UserManagement[] = [
-      {
-        id: 'admin-001',
-        email: 'admin@cleancut.com',
-        displayName: 'System Administrator',
-        role: 'admin',
-        phoneNumber: '+91 98765 43210',
-        createdAt: new Date('2024-01-01'),
-        isActive: true,
-        lastLogin: new Date()
+    from(this.firebaseService.getCollection('users', 'createdAt')).subscribe({
+      next: (users) => {
+        const processedUsers = users.map(user => ({
+          ...user,
+          createdAt: this.firebaseService.convertTimestamp(user.createdAt),
+          lastLogin: user.lastLogin ? this.firebaseService.convertTimestamp(user.lastLogin) : undefined
+        }));
+        this.usersSubject.next(processedUsers);
       },
-      {
-        id: 'owner-123',
-        email: 'owner@cleancut.com',
-        displayName: 'Shop Owner',
-        role: 'owner',
-        phoneNumber: '+91 98765 43211',
-        createdAt: new Date('2024-01-15'),
-        isActive: true,
-        lastLogin: new Date()
+      error: (error) => {
+        console.error('Error loading users:', error);
+        this.usersSubject.next([]);
       }
-    ];
-    
-    this.saveUsers(defaultUsers);
-  }
-
-  private saveUsers(users: UserManagement[]): void {
-    localStorage.setItem(this.USERS_STORAGE_KEY, JSON.stringify(users));
-    this.usersSubject.next(users);
+    });
   }
 
   createOwner(ownerData: CreateOwnerData): Observable<UserManagement> {
-    return new Observable(observer => {
-      setTimeout(() => {
-        const currentUsers = this.usersSubject.value;
-        
-        // Check if email already exists
-        if (currentUsers.some(user => user.email === ownerData.email)) {
-          observer.error('Email already exists');
-          return;
-        }
-
-        const newOwner: UserManagement = {
-          id: 'owner-' + Date.now(),
-          email: ownerData.email,
-          displayName: ownerData.displayName,
-          role: 'owner',
-          phoneNumber: ownerData.phoneNumber,
-          createdAt: new Date(),
+    return from(this.authService.createOwnerUser(ownerData)).pipe(
+      map(user => {
+        this.loadUsers(); // Refresh the users list
+        return {
+          id: user.uid,
+          email: user.email,
+          displayName: user.displayName,
+          role: user.role,
+          phoneNumber: user.phoneNumber,
+          createdAt: user.createdAt,
           isActive: true
         };
-
-        const updatedUsers = [...currentUsers, newOwner];
-        this.saveUsers(updatedUsers);
-
-        observer.next(newOwner);
-        observer.complete();
-      }, 1000);
-    });
+      }),
+      catchError(error => {
+        console.error('Error creating owner:', error);
+        let errorMessage = 'Failed to create owner';
+        
+        if (error.code === 'auth/email-already-in-use') {
+          errorMessage = 'Email is already registered';
+        } else if (error.code === 'auth/weak-password') {
+          errorMessage = 'Password is too weak';
+        } else if (error.code === 'auth/invalid-email') {
+          errorMessage = 'Invalid email address';
+        }
+        
+        throw errorMessage;
+      })
+    );
   }
 
   getAllUsers(): Observable<UserManagement[]> {
-    return this.users$;
+    return from(this.firebaseService.getCollection('users', 'createdAt')).pipe(
+      map(users => {
+        return users.map(user => ({
+          ...user,
+          createdAt: this.firebaseService.convertTimestamp(user.createdAt),
+          lastLogin: user.lastLogin ? this.firebaseService.convertTimestamp(user.lastLogin) : undefined
+        }));
+      }),
+      catchError(error => {
+        console.error('Error getting all users:', error);
+        return of([]);
+      })
+    );
   }
 
   getUsersByRole(role: 'customer' | 'owner' | 'admin'): Observable<UserManagement[]> {
-    return new Observable(observer => {
-      const users = this.usersSubject.value.filter(user => user.role === role);
-      observer.next(users);
-      observer.complete();
-    });
+    return from(this.firebaseService.getCollectionWhere('users', 'role', '==', role)).pipe(
+      map(users => {
+        return users.map(user => ({
+          ...user,
+          createdAt: this.firebaseService.convertTimestamp(user.createdAt),
+          lastLogin: user.lastLogin ? this.firebaseService.convertTimestamp(user.lastLogin) : undefined
+        }));
+      }),
+      catchError(error => {
+        console.error('Error getting users by role:', error);
+        return of([]);
+      })
+    );
   }
 
   toggleUserStatus(userId: string): Observable<boolean> {
-    return new Observable(observer => {
-      const currentUsers = this.usersSubject.value;
-      const userIndex = currentUsers.findIndex(user => user.id === userId);
-      
-      if (userIndex === -1) {
-        observer.error('User not found');
-        return;
-      }
-
-      const updatedUsers = [...currentUsers];
-      updatedUsers[userIndex] = {
-        ...updatedUsers[userIndex],
-        isActive: !updatedUsers[userIndex].isActive
-      };
-
-      this.saveUsers(updatedUsers);
-      observer.next(true);
-      observer.complete();
-    });
+    return from(this.firebaseService.getDocument('users', userId)).pipe(
+      switchMap(user => {
+        const newStatus = !user.isActive;
+        return from(this.firebaseService.updateDocument('users', userId, { 
+          isActive: newStatus,
+          updatedAt: new Date()
+        }));
+      }),
+      map(() => {
+        this.loadUsers(); // Refresh the users list
+        return true;
+      }),
+      catchError(error => {
+        console.error('Error toggling user status:', error);
+        throw error;
+      })
+    );
   }
 
   deleteUser(userId: string): Observable<boolean> {
-    return new Observable(observer => {
-      const currentUsers = this.usersSubject.value;
-      const updatedUsers = currentUsers.filter(user => user.id !== userId);
-      
-      this.saveUsers(updatedUsers);
-      observer.next(true);
-      observer.complete();
-    });
+    return from(this.firebaseService.deleteDocument('users', userId)).pipe(
+      map(() => {
+        this.loadUsers(); // Refresh the users list
+        return true;
+      }),
+      catchError(error => {
+        console.error('Error deleting user:', error);
+        throw error;
+      })
+    );
   }
 
   getAdminStats(): Observable<AdminStats> {
-    return new Observable(observer => {
-      const users = this.usersSubject.value;
-      const bookingsData = JSON.parse(localStorage.getItem('cleancut_bookings') || '[]');
-      
-      const stats: AdminStats = {
-        totalUsers: users.length,
-        totalOwners: users.filter(u => u.role === 'owner').length,
-        totalCustomers: users.filter(u => u.role === 'customer').length,
-        totalBookings: bookingsData.length,
-        totalRevenue: this.calculateTotalRevenue(bookingsData),
-        monthlyStats: {
-          bookings: this.getMonthlyBookings(bookingsData),
-          revenue: this.getMonthlyRevenue(bookingsData),
-          newUsers: this.getMonthlyUsers(users)
-        }
-      };
+    return from(Promise.all([
+      this.firebaseService.getCollection('users'),
+      this.firebaseService.getCollection('bookings')
+    ])).pipe(
+      map(([users, bookings]) => {
+        const processedBookings = bookings.map(booking => ({
+          ...booking,
+          createdAt: this.firebaseService.convertTimestamp(booking.createdAt)
+        }));
 
-      observer.next(stats);
-      observer.complete();
-    });
+        const processedUsers = users.map(user => ({
+          ...user,
+          createdAt: this.firebaseService.convertTimestamp(user.createdAt)
+        }));
+
+        const stats: AdminStats = {
+          totalUsers: processedUsers.length,
+          totalOwners: processedUsers.filter(u => u.role === 'owner').length,
+          totalCustomers: processedUsers.filter(u => u.role === 'customer').length,
+          totalBookings: processedBookings.length,
+          totalRevenue: this.calculateTotalRevenue(processedBookings),
+          monthlyStats: {
+            bookings: this.getMonthlyBookings(processedBookings),
+            revenue: this.getMonthlyRevenue(processedBookings),
+            newUsers: this.getMonthlyUsers(processedUsers)
+          }
+        };
+
+        return stats;
+      }),
+      catchError(error => {
+        console.error('Error getting admin stats:', error);
+        return of({
+          totalUsers: 0,
+          totalOwners: 0,
+          totalCustomers: 0,
+          totalBookings: 0,
+          totalRevenue: 0,
+          monthlyStats: {
+            bookings: 0,
+            revenue: 0,
+            newUsers: 0
+          }
+        });
+      })
+    );
   }
 
   private calculateTotalRevenue(bookings: any[]): number {
@@ -216,7 +237,7 @@ export class AdminService {
       }, 0);
   }
 
-  private getMonthlyUsers(users: UserManagement[]): number {
+  private getMonthlyUsers(users: any[]): number {
     const now = new Date();
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();

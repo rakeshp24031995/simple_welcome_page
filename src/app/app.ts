@@ -6,6 +6,7 @@ import { filter } from 'rxjs/operators';
 
 import { AuthService } from './auth/services/auth.service';
 import { User } from './auth/models/user.model';
+import { AppInitService } from './core/services/app-init.service';
 
 @Component({
   selector: 'app-root',
@@ -25,9 +26,19 @@ export class App implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private appInitService: AppInitService
   ) {
     this.currentUser$ = this.authService.currentUser$;
+    this.initializeApp();
+  }
+
+  private async initializeApp(): Promise<void> {
+    try {
+      await this.appInitService.initializeApp();
+    } catch (error) {
+      console.error('Failed to initialize app:', error);
+    }
   }
 
   ngOnInit(): void {

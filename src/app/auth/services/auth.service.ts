@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, of, throwError, from } from 'rxjs';
+import { map, catchError, switchMap } from 'rxjs/operators';
 import { User, LoginCredentials, RegisterData } from '../models/user.model';
+import { FirebaseService } from '../../core/services/firebase.service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,116 +14,157 @@ export class AuthService {
   private isLoadingSubject = new BehaviorSubject<boolean>(false);
   public isLoading$ = this.isLoadingSubject.asObservable();
 
-  constructor() {
-    this.checkStoredAuth();
+  constructor(private firebaseService: FirebaseService) {
+    this.initializeAuthListener();
   }
 
-  private checkStoredAuth(): void {
-    const storedUser = localStorage.getItem('cleancut_user');
-    if (storedUser) {
-      try {
-        const user = JSON.parse(storedUser);
-        this.currentUserSubject.next(user);
-      } catch (error) {
-        localStorage.removeItem('cleancut_user');
+  private initializeAuthListener(): void {
+    this.firebaseService.authState$.subscribe(async (firebaseUser) => {
+      if (firebaseUser) {
+        try {
+          // Get user profile from Firestore
+          const userProfile = await this.firebaseService.getDocument('users', firebaseUser.uid);
+          const user: User = {
+            uid: firebaseUser.uid,
+            email: firebaseUser.email || '',
+            displayName: userProfile.displayName || firebaseUser.displayName || '',
+            role: userProfile.role || 'customer',
+            phoneNumber: userProfile.phoneNumber,
+            createdAt: this.firebaseService.convertTimestamp(userProfile.createdAt),
+            isEmailVerified: firebaseUser.emailVerified
+          };
+          this.currentUserSubject.next(user);
+        } catch (error) {
+          console.error('Error loading user profile:', error);
+          this.currentUserSubject.next(null);
+        }
+      } else {
+        this.currentUserSubject.next(null);
       }
-    }
+    });
   }
 
   login(credentials: LoginCredentials): Observable<User> {
     this.isLoadingSubject.next(true);
     
-    // Simulate API call - replace with actual Firebase/backend call
-    return new Observable(observer => {
-      setTimeout(() => {
-        if (credentials.email === 'admin@cleancut.com' && credentials.password === 'admin123') {
+    return from(this.firebaseService.signInWithEmail(credentials.email, credentials.password)).pipe(
+      switchMap(async (firebaseUser) => {
+        try {
+          // Get user profile from Firestore
+          const userProfile = await this.firebaseService.getDocument('users', firebaseUser.uid);
           const user: User = {
-            uid: 'admin-001',
-            email: credentials.email,
-            displayName: 'System Administrator',
-            role: 'admin',
-            phoneNumber: '+91 98765 43210',
-            createdAt: new Date(),
-            isEmailVerified: true
+            uid: firebaseUser.uid,
+            email: firebaseUser.email || '',
+            displayName: userProfile.displayName || firebaseUser.displayName || '',
+            role: userProfile.role || 'customer',
+            phoneNumber: userProfile.phoneNumber,
+            createdAt: this.firebaseService.convertTimestamp(userProfile.createdAt),
+            isEmailVerified: firebaseUser.emailVerified
           };
           
-          localStorage.setItem('cleancut_user', JSON.stringify(user));
           this.currentUserSubject.next(user);
           this.isLoadingSubject.next(false);
-          observer.next(user);
-          observer.complete();
-        } else if (credentials.email === 'owner@cleancut.com' && credentials.password === 'password') {
-          const user: User = {
-            uid: 'owner-123',
-            email: credentials.email,
-            displayName: 'Shop Owner',
-            role: 'owner',
-            createdAt: new Date(),
-            isEmailVerified: true
-          };
-          
-          localStorage.setItem('cleancut_user', JSON.stringify(user));
-          this.currentUserSubject.next(user);
+          return user;
+        } catch (error) {
           this.isLoadingSubject.next(false);
-          observer.next(user);
-          observer.complete();
-        } else if (credentials.email.includes('@') && credentials.password.length >= 6) {
-          const user: User = {
-            uid: 'user-' + Date.now(),
-            email: credentials.email,
-            displayName: credentials.email.split('@')[0],
-            role: 'customer',
-            createdAt: new Date(),
-            isEmailVerified: true
-          };
-          
-          localStorage.setItem('cleancut_user', JSON.stringify(user));
-          this.currentUserSubject.next(user);
-          this.isLoadingSubject.next(false);
-          observer.next(user);
-          observer.complete();
-        } else {
-          this.isLoadingSubject.next(false);
-          observer.error('Invalid email or password');
+          throw error;
         }
-      }, 1500);
-    });
+      }),
+      catchError((error) => {
+        this.isLoadingSubject.next(false);
+        let errorMessage = 'Login failed';
+        
+        switch (error.code) {
+          case 'auth/user-not-found':
+            errorMessage = 'No user found with this email';
+            break;
+          case 'auth/wrong-password':
+            errorMessage = 'Invalid password';
+            break;
+          case 'auth/invalid-email':
+            errorMessage = 'Invalid email address';
+            break;
+          case 'auth/too-many-requests':
+            errorMessage = 'Too many failed attempts. Please try again later';
+            break;
+          default:
+            errorMessage = error.message || 'Login failed';
+        }
+        
+        return throwError(() => errorMessage);
+      })
+    );
   }
 
   register(userData: RegisterData): Observable<User> {
     this.isLoadingSubject.next(true);
     
-    // Simulate API call - replace with actual Firebase/backend call
-    return new Observable(observer => {
-      setTimeout(() => {
-        if (userData.email.includes('@') && userData.password.length >= 6) {
-          const user: User = {
-            uid: 'user-' + Date.now(),
+    return from(this.firebaseService.createUserWithEmail(userData.email, userData.password, userData.displayName)).pipe(
+      switchMap(async (firebaseUser) => {
+        try {
+          // Create user profile in Firestore
+          const userProfile = {
+            displayName: userData.displayName,
             email: userData.email,
+            phoneNumber: userData.phoneNumber,
+            role: 'customer' as const,
+            isActive: true
+          };
+          
+          await this.firebaseService.createDocument('users', firebaseUser.uid, userProfile);
+          
+          const user: User = {
+            uid: firebaseUser.uid,
+            email: firebaseUser.email || '',
             displayName: userData.displayName,
             role: 'customer',
             phoneNumber: userData.phoneNumber,
             createdAt: new Date(),
-            isEmailVerified: false
+            isEmailVerified: firebaseUser.emailVerified
           };
           
-          localStorage.setItem('cleancut_user', JSON.stringify(user));
           this.currentUserSubject.next(user);
           this.isLoadingSubject.next(false);
-          observer.next(user);
-          observer.complete();
-        } else {
+          return user;
+        } catch (error) {
           this.isLoadingSubject.next(false);
-          observer.error('Invalid registration data');
+          throw error;
         }
-      }, 1500);
-    });
+      }),
+      catchError((error) => {
+        this.isLoadingSubject.next(false);
+        let errorMessage = 'Registration failed';
+        
+        switch (error.code) {
+          case 'auth/email-already-in-use':
+            errorMessage = 'Email is already registered';
+            break;
+          case 'auth/invalid-email':
+            errorMessage = 'Invalid email address';
+            break;
+          case 'auth/weak-password':
+            errorMessage = 'Password is too weak';
+            break;
+          default:
+            errorMessage = error.message || 'Registration failed';
+        }
+        
+        return throwError(() => errorMessage);
+      })
+    );
   }
 
   logout(): Observable<boolean> {
-    localStorage.removeItem('cleancut_user');
-    this.currentUserSubject.next(null);
-    return of(true);
+    return from(this.firebaseService.signOutUser()).pipe(
+      map(() => {
+        this.currentUserSubject.next(null);
+        return true;
+      }),
+      catchError((error) => {
+        console.error('Logout error:', error);
+        return of(false);
+      })
+    );
   }
 
   getCurrentUser(): User | null {
@@ -155,5 +198,70 @@ export class AuthService {
   hasOwnerAccess(): boolean {
     const user = this.getCurrentUser();
     return user?.role === 'owner' || user?.role === 'admin';
+  }
+
+  // Create admin user (should be called during app initialization)
+  async createAdminUser(): Promise<void> {
+    try {
+      const adminEmail = 'admin@cleancut.com';
+      const adminPassword = 'admin123';
+      
+      // Check if admin already exists
+      const existingUsers = await this.firebaseService.getCollectionWhere('users', 'email', '==', adminEmail);
+      if (existingUsers.length > 0) {
+        console.log('Admin user already exists');
+        return;
+      }
+
+      // Create Firebase auth user
+      const firebaseUser = await this.firebaseService.createUserWithEmail(adminEmail, adminPassword, 'System Administrator');
+      
+      // Create admin profile in Firestore
+      const adminProfile = {
+        displayName: 'System Administrator',
+        email: adminEmail,
+        phoneNumber: '+91 98765 43210',
+        role: 'admin' as const,
+        isActive: true
+      };
+      
+      await this.firebaseService.createDocument('users', firebaseUser.uid, adminProfile);
+      console.log('Admin user created successfully');
+    } catch (error) {
+      console.error('Error creating admin user:', error);
+    }
+  }
+
+  // Create owner user (can be called by admin)
+  async createOwnerUser(ownerData: { email: string; password: string; displayName: string; phoneNumber: string }): Promise<User> {
+    try {
+      // Create Firebase auth user
+      const firebaseUser = await this.firebaseService.createUserWithEmail(ownerData.email, ownerData.password, ownerData.displayName);
+      
+      // Create owner profile in Firestore
+      const ownerProfile = {
+        displayName: ownerData.displayName,
+        email: ownerData.email,
+        phoneNumber: ownerData.phoneNumber,
+        role: 'owner' as const,
+        isActive: true
+      };
+      
+      await this.firebaseService.createDocument('users', firebaseUser.uid, ownerProfile);
+      
+      const user: User = {
+        uid: firebaseUser.uid,
+        email: firebaseUser.email || '',
+        displayName: ownerData.displayName,
+        role: 'owner',
+        phoneNumber: ownerData.phoneNumber,
+        createdAt: new Date(),
+        isEmailVerified: firebaseUser.emailVerified
+      };
+      
+      return user;
+    } catch (error) {
+      throw error;
+    }
   }
 }
