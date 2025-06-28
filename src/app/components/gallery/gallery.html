@@ -34,35 +34,11 @@
       </div>
     </div>
 
-    <!-- Before/After Section -->
-    <div class="mt-20 bg-white rounded-2xl shadow-xl p-8">
-      <h3 class="text-3xl font-bold text-center text-dark mb-12">
-        Before & <span class="text-gold">After</span>
-      </h3>
-      
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div *ngFor="let beforeAfter of beforeAfterItems" class="space-y-4">
-          <div class="grid grid-cols-2 gap-4">
-            <div class="text-center">
-              <h4 class="font-semibold text-gray-600 mb-2">Before</h4>
-              <img [src]="beforeAfter.before" [alt]="beforeAfter.title + ' before'" 
-                   class="w-full h-48 object-cover rounded-lg">
-            </div>
-            <div class="text-center">
-              <h4 class="font-semibold text-gold mb-2">After</h4>
-              <img [src]="beforeAfter.after" [alt]="beforeAfter.title + ' after'" 
-                   class="w-full h-48 object-cover rounded-lg">
-            </div>
-          </div>
-          <h5 class="text-center font-semibold text-dark">{{ beforeAfter.title }}</h5>
-        </div>
-      </div>
-    </div>
 
     <!-- CTA -->
     <div class="text-center mt-12">
       <button class="btn-primary">
-        Book Your Transformation
+        Book Your Appointment
       </button>
     </div>
   </div>

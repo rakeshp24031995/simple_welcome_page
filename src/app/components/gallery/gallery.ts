@@ -26,16 +26,4 @@ export class Gallery {
     }
   ];
 
-  beforeAfterItems = [
-    {
-      title: 'Modern Fade Cut',
-      before: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
-      after: 'https://images.unsplash.com/photo-1605497788044-5a32c7078486?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
-    },
-    {
-      title: 'Beard Transformation',
-      before: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
-      after: 'https://images.unsplash.com/photo-1621605815971-fbc98d665033?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
-    }
-  ];
 }
