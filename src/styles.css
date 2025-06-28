@@ -38,3 +38,6 @@
     @apply transition-all duration-300 hover:shadow-2xl hover:-translate-y-2;
   }
 }
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

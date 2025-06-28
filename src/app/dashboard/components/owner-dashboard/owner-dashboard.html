@@ -1,0 +1,202 @@
+<div class="min-h-screen bg-gray-50 pt-20">
+  <div class="container-custom py-12">
+    <div class="max-w-7xl mx-auto">
+      <!-- Header -->
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
+        <div>
+          <h1 class="text-4xl font-bold text-dark mb-2">
+            Owner <span class="text-gold">Dashboard</span>
+          </h1>
+          <p class="text-lg text-gray-600">
+            Manage your barbershop appointments and view business insights.
+          </p>
+        </div>
+        
+        <div class="mt-4 lg:mt-0">
+          <div class="flex items-center space-x-2 text-sm text-gray-600">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span>Last updated: {{ lastUpdated | date:'medium' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-2xl shadow-lg p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-medium text-gray-600">Total Bookings</h3>
+              <p class="text-3xl font-bold text-dark">{{ stats.total }}</p>
+            </div>
+            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-lg p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-medium text-gray-600">Pending</h3>
+              <p class="text-3xl font-bold text-orange-600">{{ stats.pending }}</p>
+            </div>
+            <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+              <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-lg p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-medium text-gray-600">Confirmed</h3>
+              <p class="text-3xl font-bold text-blue-600">{{ stats.confirmed }}</p>
+            </div>
+            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-lg p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-medium text-gray-600">This Month</h3>
+              <p class="text-3xl font-bold text-gold">{{ stats.thisMonth }}</p>
+            </div>
+            <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+              <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter Controls -->
+      <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+          <div class="flex flex-wrap items-center space-x-4">
+            <span class="text-sm font-medium text-gray-700">Filter by status:</span>
+            <button 
+              *ngFor="let status of statusFilters"
+              (click)="setStatusFilter(status.value)"
+              [class]="currentStatusFilter === status.value ? 'btn-primary' : 'btn-secondary'"
+              class="px-4 py-2 text-sm"
+            >
+              {{ status.label }}
+            </button>
+          </div>
+          
+          <div class="flex items-center space-x-4">
+            <input
+              type="date"
+              [(ngModel)]="selectedDate"
+              (change)="onDateFilterChange()"
+              class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"
+            >
+            <button 
+              (click)="refreshData()"
+              class="p-2 text-gray-600 hover:text-dark transition-colors duration-300"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bookings Table -->
+      <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h2 class="text-xl font-bold text-dark">Recent Bookings</h2>
+        </div>
+        
+        <div *ngIf="isLoading" class="text-center py-12">
+          <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gold mb-4"></div>
+          <p class="text-gray-600">Loading bookings...</p>
+        </div>
+
+        <div *ngIf="!isLoading && filteredBookings.length === 0" class="text-center py-12">
+          <div class="mx-auto w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mb-4">
+            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-700 mb-2">No bookings found</h3>
+          <p class="text-gray-500">No bookings match your current filters.</p>
+        </div>
+
+        <div *ngIf="!isLoading && filteredBookings.length > 0" class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr *ngFor="let booking of filteredBookings" class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div>
+                    <div class="text-sm font-medium text-gray-900">{{ booking.customerName }}</div>
+                    <div class="text-sm text-gray-500">{{ booking.customerPhone }}</div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-900">{{ getServiceName(booking.service) }}</div>
+                  <div *ngIf="booking.notes" class="text-sm text-gray-500">{{ booking.notes }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-900">{{ booking.date | date:'mediumDate' }}</div>
+                  <div class="text-sm text-gray-500">{{ formatTime(booking.time) }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span [class]="getStatusBadgeClass(booking.status)" 
+                        class="inline-flex px-2 py-1 text-xs font-semibold rounded-full">
+                    {{ booking.status | titlecase }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                  <button 
+                    *ngIf="booking.status === 'pending'"
+                    (click)="confirmBooking(booking)"
+                    class="text-green-600 hover:text-green-900 transition-colors duration-300"
+                  >
+                    Confirm
+                  </button>
+                  <button 
+                    *ngIf="booking.status === 'confirmed'"
+                    (click)="completeBooking(booking)"
+                    class="text-blue-600 hover:text-blue-900 transition-colors duration-300"
+                  >
+                    Complete
+                  </button>
+                  <button 
+                    *ngIf="booking.status === 'pending' || booking.status === 'confirmed'"
+                    (click)="cancelBooking(booking)"
+                    class="text-red-600 hover:text-red-900 transition-colors duration-300"
+                  >
+                    Cancel
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

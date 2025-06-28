@@ -1,32 +1,56 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, OnInit, HostListener } from '@angular/core';
+import { Router, RouterOutlet, RouterModule, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { Observable } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
-// Import all components
-import { Hero } from './components/hero/hero';
-import { About } from './components/about/about';
-import { Services } from './components/services/services';
-import { Gallery } from './components/gallery/gallery';
-import { Testimonials } from './components/testimonials/testimonials';
-import { Contact } from './components/contact/contact';
-import { Footer } from './components/footer/footer';
+import { AuthService } from './auth/services/auth.service';
+import { User } from './auth/models/user.model';
 
 @Component({
   selector: 'app-root',
   imports: [
     RouterOutlet, 
-    CommonModule,
-    Hero,
-    About,
-    Services,
-    Gallery,
-    Testimonials,
-    Contact,
-    Footer
+    RouterModule,
+    CommonModule
   ],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App {
+export class App implements OnInit {
   protected title = 'CleanCut - Premium Indian Barbershop';
+  currentUser$: Observable<User | null>;
+  showUserMenu = false;
+  isHomePage = true;
+
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {
+    this.currentUser$ = this.authService.currentUser$;
+  }
+
+  ngOnInit(): void {
+    // Track route changes to determine if we're on home page
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: NavigationEnd) => {
+      this.isHomePage = event.url === '/' || event.url === '';
+    });
+  }
+
+  toggleUserMenu(): void {
+    this.showUserMenu = !this.showUserMenu;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    this.showUserMenu = false;
+  }
+
+  logout(): void {
+    this.authService.logout().subscribe(() => {
+      this.router.navigate(['/']);
+    });
+  }
 }

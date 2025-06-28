@@ -1,35 +1,71 @@
 <!-- Navigation Header -->
 <header class="fixed top-0 w-full bg-dark bg-opacity-95 backdrop-blur-sm z-50 transition-all duration-300">
   <nav class="container-custom flex items-center justify-between py-4">
-    <div class="text-2xl font-bold">
+    <a routerLink="/" class="text-2xl font-bold cursor-pointer">
       <span class="text-white font-light tracking-wider">Clean</span>
       <span class="text-gold font-black tracking-tight">Cut</span>
-    </div>
+    </a>
     
+    <!-- Navigation Menu -->
     <ul class="hidden md:flex space-x-8 text-white">
-      <li><a href="#home" class="hover:text-gold transition-colors duration-300">Home</a></li>
-      <li><a href="#about" class="hover:text-gold transition-colors duration-300">About</a></li>
-      <li><a href="#services" class="hover:text-gold transition-colors duration-300">Services</a></li>
-      <li><a href="#gallery" class="hover:text-gold transition-colors duration-300">Gallery</a></li>
-      <li><a href="#testimonials" class="hover:text-gold transition-colors duration-300">Reviews</a></li>
-      <li><a href="#contact" class="hover:text-gold transition-colors duration-300">Contact</a></li>
+      <li><a routerLink="/" fragment="home" class="hover:text-gold transition-colors duration-300">Home</a></li>
+      <li><a routerLink="/" fragment="about" class="hover:text-gold transition-colors duration-300">About</a></li>
+      <li><a routerLink="/" fragment="services" class="hover:text-gold transition-colors duration-300">Services</a></li>
+      <li><a routerLink="/" fragment="gallery" class="hover:text-gold transition-colors duration-300">Gallery</a></li>
+      <li><a routerLink="/" fragment="testimonials" class="hover:text-gold transition-colors duration-300">Reviews</a></li>
+      <li><a routerLink="/" fragment="contact" class="hover:text-gold transition-colors duration-300">Contact</a></li>
     </ul>
     
-    <button class="btn-primary">
-      Book Now
-    </button>
+    <!-- Auth Buttons -->
+    <div class="flex items-center space-x-4">
+      <!-- Authenticated User Menu -->
+      <div *ngIf="currentUser$ | async as user; else guestButtons" class="flex items-center space-x-4">
+        <div class="relative" (click)="toggleUserMenu()">
+          <button class="flex items-center space-x-2 text-white hover:text-gold transition-colors duration-300">
+            <div class="w-8 h-8 bg-gold rounded-full flex items-center justify-center text-dark font-bold">
+              {{ user.displayName.charAt(0).toUpperCase() }}
+            </div>
+            <span class="hidden sm:block">{{ user.displayName }}</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          
+          <!-- Dropdown Menu -->
+          <div *ngIf="showUserMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+            <a routerLink="/profile" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 transition-colors duration-300">
+              My Profile
+            </a>
+            <a routerLink="/my-bookings" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 transition-colors duration-300">
+              My Bookings
+            </a>
+            <a *ngIf="user.role === 'owner' || user.role === 'admin'" 
+               routerLink="/dashboard" 
+               class="block px-4 py-2 text-gray-800 hover:bg-gray-100 transition-colors duration-300">
+              Dashboard
+            </a>
+            <hr class="my-2">
+            <button (click)="logout()" class="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100 transition-colors duration-300">
+              Sign Out
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Guest Buttons -->
+      <ng-template #guestButtons>
+        <div class="flex items-center space-x-3">
+          <a routerLink="/login" class="text-white hover:text-gold transition-colors duration-300 font-semibold">
+            Sign In
+          </a>
+          <a routerLink="/register" class="btn-primary">
+            Book Now
+          </a>
+        </div>
+      </ng-template>
+    </div>
   </nav>
 </header>
 
-<!-- Main Content -->
-<main>
-  <app-hero></app-hero>
-  <app-about></app-about>
-  <app-services></app-services>
-  <app-gallery></app-gallery>
-  <app-testimonials></app-testimonials>
-  <app-contact></app-contact>
-  <app-footer></app-footer>
-</main>
-
+<!-- Router Outlet for all pages -->
 <router-outlet />
