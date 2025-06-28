@@ -43,14 +43,26 @@ export class App implements OnInit {
     this.showUserMenu = !this.showUserMenu;
   }
 
+  closeUserMenu(): void {
+    this.showUserMenu = false;
+  }
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event): void {
     this.showUserMenu = false;
   }
 
   logout(): void {
-    this.authService.logout().subscribe(() => {
-      this.router.navigate(['/']);
-    });
+    this.showUserMenu = false; // Close menu immediately
+    
+    // Optional: Add confirmation dialog for better UX
+    if (confirm('Are you sure you want to sign out?')) {
+      this.authService.logout().subscribe(() => {
+        // Navigate to home page and scroll to top
+        this.router.navigate(['/']).then(() => {
+          window.scrollTo(0, 0);
+        });
+      });
+    }
   }
 }
