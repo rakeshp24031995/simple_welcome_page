@@ -16,7 +16,7 @@ export class App {
       name: 'Classic Haircut', 
       description: 'Traditional cuts with modern flair', 
       price: '$25',
-      image: 'https://images.unsplash.com/photo-1622286346003-c8e7fa8b5e2e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
+      image: 'https://images.unsplash.com/photo-1605497788044-5a32c7078486?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
     },
     { 
       name: 'Beard Trim', 
@@ -34,7 +34,7 @@ export class App {
       name: 'Hair Wash & Style', 
       description: 'Complete hair care and styling', 
       price: '$20',
-      image: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
+      image: 'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
     }
   ];
 }
