@@ -1,5 +1,7 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
+import { initializeApp, FirebaseApp } from 'firebase/app';
 import { 
+  getAuth, 
   Auth, 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword,
@@ -7,8 +9,9 @@ import {
   updateProfile,
   User as FirebaseUser,
   onAuthStateChanged
-} from '@angular/fire/auth';
+} from 'firebase/auth';
 import { 
+  getFirestore, 
   Firestore, 
   doc, 
   setDoc, 
@@ -22,24 +25,48 @@ import {
   deleteDoc,
   addDoc,
   Timestamp
-} from '@angular/fire/firestore';
+} from 'firebase/firestore';
+import { environment } from '../../../environments/environment';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FirebaseService {
-  private auth: Auth = inject(Auth);
-  private firestore: Firestore = inject(Firestore);
+  private app: FirebaseApp;
+  private auth: Auth;
+  private firestore: Firestore;
   
   private authStateSubject = new BehaviorSubject<FirebaseUser | null>(null);
   public authState$ = this.authStateSubject.asObservable();
 
   constructor() {
-    // Listen to auth state changes
-    onAuthStateChanged(this.auth, (user) => {
-      this.authStateSubject.next(user);
-    });
+    try {
+      // Validate Firebase configuration
+      if (!environment.firebase.apiKey || !environment.firebase.projectId) {
+        throw new Error('Firebase configuration is incomplete');
+      }
+      
+      console.log('Initializing Firebase with config:', {
+        projectId: environment.firebase.projectId,
+        authDomain: environment.firebase.authDomain
+      });
+      
+      // Initialize Firebase
+      this.app = initializeApp(environment.firebase);
+      this.auth = getAuth(this.app);
+      this.firestore = getFirestore(this.app);
+      
+      console.log('Firebase initialized successfully');
+      
+      // Listen to auth state changes
+      onAuthStateChanged(this.auth, (user) => {
+        this.authStateSubject.next(user);
+      });
+    } catch (error) {
+      console.error('Firebase initialization error:', error);
+      throw error;
+    }
   }
 
   // Authentication Methods
