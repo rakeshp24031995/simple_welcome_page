@@ -1,7 +1,5 @@
-import { Injectable } from '@angular/core';
-import { initializeApp } from 'firebase/app';
+import { Injectable, inject } from '@angular/core';
 import { 
-  getAuth, 
   Auth, 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword,
@@ -9,9 +7,8 @@ import {
   updateProfile,
   User as FirebaseUser,
   onAuthStateChanged
-} from 'firebase/auth';
+} from '@angular/fire/auth';
 import { 
-  getFirestore, 
   Firestore, 
   doc, 
   setDoc, 
@@ -25,17 +22,15 @@ import {
   deleteDoc,
   addDoc,
   Timestamp
-} from 'firebase/firestore';
-import { environment } from '../../../environments/environment';
+} from '@angular/fire/firestore';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FirebaseService {
-  private app = initializeApp(environment.firebase);
-  private auth: Auth = getAuth(this.app);
-  private firestore: Firestore = getFirestore(this.app);
+  private auth: Auth = inject(Auth);
+  private firestore: Firestore = inject(Firestore);
   
   private authStateSubject = new BehaviorSubject<FirebaseUser | null>(null);
   public authState$ = this.authStateSubject.asObservable();
