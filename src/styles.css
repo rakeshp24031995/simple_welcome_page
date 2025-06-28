@@ -53,6 +53,56 @@
   .border-gradient {
     @apply border-2 border-transparent bg-gradient-to-r from-gold to-gold-400 bg-clip-border;
   }
+
+  /* 3D Text Effects */
+  .text-3d-white {
+    text-shadow: 
+      0 1px 0 #ccc,
+      0 2px 0 #c9c9c9,
+      0 3px 0 #bbb,
+      0 4px 0 #b9b9b9,
+      0 5px 0 #aaa,
+      0 6px 1px rgba(0,0,0,.1),
+      0 0 5px rgba(0,0,0,.1),
+      0 1px 3px rgba(0,0,0,.3),
+      0 3px 5px rgba(0,0,0,.2),
+      0 5px 10px rgba(0,0,0,.25),
+      0 10px 10px rgba(0,0,0,.2),
+      0 20px 20px rgba(0,0,0,.15);
+  }
+
+  .text-3d-gold {
+    text-shadow: 
+      0 1px 0 #B8941F,
+      0 2px 0 #B8941F,
+      0 3px 0 #A67C00,
+      0 4px 0 #A67C00,
+      0 5px 0 #947100,
+      0 6px 1px rgba(0,0,0,.1),
+      0 0 5px rgba(255,215,0,.3),
+      0 1px 3px rgba(0,0,0,.3),
+      0 3px 5px rgba(255,215,0,.2),
+      0 5px 10px rgba(0,0,0,.25),
+      0 10px 10px rgba(255,215,0,.2),
+      0 20px 20px rgba(0,0,0,.15);
+    color: #FFD700;
+  }
+
+  .text-3d-black {
+    text-shadow: 
+      0 1px 0 #000,
+      0 2px 0 #000,
+      0 3px 0 #000,
+      0 4px 0 #000,
+      0 5px 0 #000,
+      0 6px 1px rgba(0,0,0,.1),
+      0 0 5px rgba(0,0,0,.1),
+      0 1px 3px rgba(0,0,0,.3),
+      0 3px 5px rgba(0,0,0,.2),
+      0 5px 10px rgba(0,0,0,.25),
+      0 10px 10px rgba(0,0,0,.2),
+      0 20px 20px rgba(0,0,0,.15);
+  }
 }
 
 html, body { height: 100%; }
