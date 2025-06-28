@@ -14,6 +14,9 @@
 
 <main class="main">
   <section id="home" class="hero">
+    <div class="hero-image">
+      <img src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80" alt="Modern barbershop interior" loading="lazy">
+    </div>
     <div class="hero-content">
       <h1>Welcome to <span class="brand-name">Clean<span class="accent">Cut</span></span></h1>
       <p>Where style meets precision. Experience the finest in men's grooming.</p>
@@ -26,9 +29,14 @@
       <h2>Our Services</h2>
       <div class="services-grid">
         <div class="service-card" *ngFor="let service of services">
-          <h3>{{ service.name }}</h3>
-          <p>{{ service.description }}</p>
-          <span class="price">{{ service.price }}</span>
+          <div class="service-image">
+            <img [src]="service.image" [alt]="service.name" loading="lazy">
+          </div>
+          <div class="service-content">
+            <h3>{{ service.name }}</h3>
+            <p>{{ service.description }}</p>
+            <span class="price">{{ service.price }}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -36,8 +44,16 @@
 
   <section id="about" class="about">
     <div class="container">
-      <h2>About Clean<span class="accent">Cut</span></h2>
-      <p>With over 15 years of experience, our master barbers combine traditional techniques with contemporary styles. We're committed to providing exceptional service in a comfortable, welcoming environment.</p>
+      <div class="about-content">
+        <div class="about-text">
+          <h2>About Clean<span class="accent">Cut</span></h2>
+          <p>With over 15 years of experience, our master barbers combine traditional techniques with contemporary styles. We're committed to providing exceptional service in a comfortable, welcoming environment.</p>
+          <p>Our skilled team stays updated with the latest trends while honoring classic barbering traditions. Every visit is an experience in precision, style, and relaxation.</p>
+        </div>
+        <div class="about-image">
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Professional barber at work" loading="lazy">
+        </div>
+      </div>
     </div>
   </section>
 

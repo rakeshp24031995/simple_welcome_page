@@ -82,7 +82,7 @@ body {
 }
 
 .hero {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
+  position: relative;
   color: white;
   text-align: center;
   padding: 6rem 2rem;
@@ -90,6 +90,29 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+}
+
+.hero-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.hero-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.4);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
 }
 
 .hero-content h1 {
@@ -154,18 +177,40 @@ body {
 }
 
 .service-card {
-  background: #f8f9fa;
-  padding: 2rem;
-  border-radius: 10px;
-  text-align: center;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
+  background: #ffffff;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   border: 2px solid transparent;
 }
 
+.service-image {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+}
+
+.service-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.service-content {
+  padding: 1.5rem;
+  text-align: center;
+}
+
 .service-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-10px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
   border-color: #d4af37;
+}
+
+.service-card:hover .service-image img {
+  transform: scale(1.05);
 }
 
 .service-card h3 {
@@ -189,7 +234,29 @@ body {
   padding: 5rem 0;
   background: #1a1a1a;
   color: white;
-  text-align: center;
+}
+
+.about-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.about-text {
+  text-align: left;
+}
+
+.about-image {
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.about-image img {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
 }
 
 .about h2 {
@@ -199,6 +266,10 @@ body {
   font-family: 'Georgia', serif;
   font-weight: 300;
   letter-spacing: 2px;
+}
+
+.about-text p {
+  margin-bottom: 1.5rem;
 }
 
 .about p {
@@ -264,5 +335,22 @@ body {
   
   .container {
     padding: 0 1rem;
+  }
+  
+  .about-content {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .about-text {
+    text-align: center;
+  }
+  
+  .about-image img {
+    height: 300px;
+  }
+  
+  .service-image {
+    height: 150px;
   }
 }
