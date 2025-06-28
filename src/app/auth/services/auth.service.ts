@@ -206,16 +206,25 @@ export class AuthService {
       const adminEmail = 'admin@cleancut.com';
       const adminPassword = 'admin123';
       
-      // Check if admin already exists
-      const existingUsers = await this.firebaseService.getCollectionWhere('users', 'email', '==', adminEmail);
-      if (existingUsers.length > 0) {
-        console.log('Admin user already exists');
-        return;
+      console.log('Starting admin user creation...');
+      
+      // Check if admin already exists in Firestore
+      try {
+        const existingUsers = await this.firebaseService.getCollectionWhere('users', 'email', '==', adminEmail);
+        if (existingUsers.length > 0) {
+          console.log('Admin user already exists in Firestore');
+          return;
+        }
+      } catch (firestoreError) {
+        console.log('Could not check existing users, continuing with creation:', firestoreError);
       }
 
+      console.log('Creating Firebase auth user...');
       // Create Firebase auth user
       const firebaseUser = await this.firebaseService.createUserWithEmail(adminEmail, adminPassword, 'System Administrator');
+      console.log('Firebase auth user created:', firebaseUser.uid);
       
+      console.log('Creating admin profile in Firestore...');
       // Create admin profile in Firestore
       const adminProfile = {
         displayName: 'System Administrator',
@@ -226,9 +235,12 @@ export class AuthService {
       };
       
       await this.firebaseService.createDocument('users', firebaseUser.uid, adminProfile);
-      console.log('Admin user created successfully');
-    } catch (error) {
+      console.log('Admin user created successfully in Firestore');
+    } catch (error: any) {
       console.error('Error creating admin user:', error);
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
+      throw error;
     }
   }
 

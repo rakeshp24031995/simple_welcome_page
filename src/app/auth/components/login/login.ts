@@ -68,9 +68,10 @@ export class Login implements OnInit {
 
     try {
       await this.authService.createAdminUser();
-      this.errorMessage = 'Admin user created successfully! You can now login.';
+      this.errorMessage = 'Admin user created successfully! You can now login with admin@cleancut.com / admin123';
     } catch (error: any) {
-      this.errorMessage = error.message || 'Failed to create admin user';
+      console.error('Admin creation failed:', error);
+      this.errorMessage = `Failed to create admin user: ${error.code || error.message}`;
     } finally {
       this.creatingAdmin = false;
     }
