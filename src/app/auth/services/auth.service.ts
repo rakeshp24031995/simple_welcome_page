@@ -216,22 +216,31 @@ export class AuthService {
         // Continue with creation if check fails
       }
 
-      // Create Firebase auth user
-      const firebaseUser = await this.firebaseService.createUserWithEmail(adminEmail, adminPassword, 'System Administrator');
-      
-      // Create admin profile in Firestore
-      const adminProfile = {
-        displayName: 'System Administrator',
-        email: adminEmail,
-        phoneNumber: '+91 98765 43210',
-        role: 'admin' as const,
-        isActive: true
-      };
-      
-      await this.firebaseService.createDocument('users', firebaseUser.uid, adminProfile);
+      // Try to create Firebase auth user
+      try {
+        const firebaseUser = await this.firebaseService.createUserWithEmail(adminEmail, adminPassword, 'System Administrator');
+        
+        // Create admin profile in Firestore
+        const adminProfile = {
+          displayName: 'System Administrator',
+          email: adminEmail,
+          phoneNumber: '+91 98765 43210',
+          role: 'admin' as const,
+          isActive: true
+        };
+        
+        await this.firebaseService.createDocument('users', firebaseUser.uid, adminProfile);
+      } catch (authError: any) {
+        // If user already exists in Firebase Auth, that's fine
+        if (authError.code === 'auth/email-already-in-use') {
+          console.log('Admin user already exists in Firebase Auth');
+          return;
+        }
+        throw authError;
+      }
     } catch (error: any) {
       console.error('Error creating admin user:', error);
-      throw error;
+      // Don't throw error to prevent app initialization failure
     }
   }
 
