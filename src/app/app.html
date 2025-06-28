@@ -25,25 +25,10 @@
     <div class="container">
       <h2>Our Services</h2>
       <div class="services-grid">
-        <div class="service-card">
-          <h3>Classic Haircut</h3>
-          <p>Traditional cuts with modern flair</p>
-          <span class="price">$25</span>
-        </div>
-        <div class="service-card">
-          <h3>Beard Trim</h3>
-          <p>Professional beard shaping and styling</p>
-          <span class="price">$15</span>
-        </div>
-        <div class="service-card">
-          <h3>Hot Towel Shave</h3>
-          <p>Luxurious traditional shaving experience</p>
-          <span class="price">$30</span>
-        </div>
-        <div class="service-card">
-          <h3>Hair Wash & Style</h3>
-          <p>Complete hair care and styling</p>
-          <span class="price">$20</span>
+        <div class="service-card" *ngFor="let service of services">
+          <h3>{{ service.name }}</h3>
+          <p>{{ service.description }}</p>
+          <span class="price">{{ service.price }}</span>
         </div>
       </div>
     </div>
