@@ -16,6 +16,7 @@ export class Login implements OnInit {
   errorMessage = '';
   isLoading = false;
   returnUrl = '/';
+  creatingAdmin = false;
 
   constructor(
     private fb: FormBuilder,
@@ -58,6 +59,20 @@ export class Login implements OnInit {
           this.errorMessage = error || 'An error occurred during login';
         }
       });
+    }
+  }
+
+  async createAdminUser(): Promise<void> {
+    this.creatingAdmin = true;
+    this.errorMessage = '';
+
+    try {
+      await this.authService.createAdminUser();
+      this.errorMessage = 'Admin user created successfully! You can now login.';
+    } catch (error: any) {
+      this.errorMessage = error.message || 'Failed to create admin user';
+    } finally {
+      this.creatingAdmin = false;
     }
   }
 }
