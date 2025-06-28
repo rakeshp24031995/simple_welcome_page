@@ -39,7 +39,8 @@ export class App implements OnInit {
     });
   }
 
-  toggleUserMenu(): void {
+  toggleUserMenu(event: Event): void {
+    event.stopPropagation(); // Prevent document click handler
     this.showUserMenu = !this.showUserMenu;
   }
 
@@ -49,13 +50,20 @@ export class App implements OnInit {
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event): void {
-    this.showUserMenu = false;
+    // Only close menu if we're not clicking on the menu itself
+    if (this.showUserMenu) {
+      this.showUserMenu = false;
+    }
   }
 
-  logout(): void {
+  logout(event?: Event): void {
+    if (event) {
+      event.stopPropagation(); // Prevent any parent click handlers
+    }
+    
     this.showUserMenu = false; // Close menu immediately
     
-    // Optional: Add confirmation dialog for better UX
+    // Add confirmation dialog for better UX
     if (confirm('Are you sure you want to sign out?')) {
       this.authService.logout().subscribe(() => {
         // Navigate to home page and scroll to top
