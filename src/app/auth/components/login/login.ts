@@ -16,7 +16,6 @@ export class Login implements OnInit {
   errorMessage = '';
   isLoading = false;
   returnUrl = '/';
-  creatingAdmin = false;
 
   constructor(
     private fb: FormBuilder,
@@ -62,18 +61,4 @@ export class Login implements OnInit {
     }
   }
 
-  async createAdminUser(): Promise<void> {
-    this.creatingAdmin = true;
-    this.errorMessage = '';
-
-    try {
-      await this.authService.createAdminUser();
-      this.errorMessage = 'Admin user created successfully! You can now login with admin@cleancut.com / admin123';
-    } catch (error: any) {
-      console.error('Admin creation failed:', error);
-      this.errorMessage = `Failed to create admin user: ${error.code || error.message}`;
-    } finally {
-      this.creatingAdmin = false;
-    }
-  }
 }

@@ -47,17 +47,10 @@ export class FirebaseService {
         throw new Error('Firebase configuration is incomplete');
       }
       
-      console.log('Initializing Firebase with config:', {
-        projectId: environment.firebase.projectId,
-        authDomain: environment.firebase.authDomain
-      });
-      
       // Initialize Firebase
       this.app = initializeApp(environment.firebase);
       this.auth = getAuth(this.app);
       this.firestore = getFirestore(this.app);
-      
-      console.log('Firebase initialized successfully');
       
       // Listen to auth state changes
       onAuthStateChanged(this.auth, (user) => {
