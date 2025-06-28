@@ -54,10 +54,15 @@ export const guestGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
+  console.log('Guest Guard - isAuthenticated:', authService.isAuthenticated());
+  console.log('Guest Guard - currentUser:', authService.getCurrentUser());
+
   if (!authService.isAuthenticated()) {
+    console.log('Guest Guard - allowing access to:', state.url);
     return true;
   }
 
+  console.log('Guest Guard - redirecting authenticated user');
   // Redirect authenticated users to their dashboard
   if (authService.isAdmin()) {
     router.navigate(['/admin']);
