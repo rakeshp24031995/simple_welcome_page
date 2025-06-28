@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
   styleUrl: './app.css'
 })
 export class App {
-  protected title = 'Elite Cuts';
+  protected title = 'Clean Cut';
   
   services = [
     { name: 'Classic Haircut', description: 'Traditional cuts with modern flair', price: '$25' },
