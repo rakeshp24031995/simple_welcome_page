@@ -70,9 +70,12 @@ export class OtpService {
    */
   sendOTP(phoneNumber: string): Observable<boolean> {
     return new Observable(observer => {
+      console.log('🔐 Starting OTP send process...', { phoneNumber });
+      
       // Check rate limiting
       const currentSession = this.currentOtpSession.getValue();
       if (currentSession && this.isRateLimited(currentSession)) {
+        console.warn('⚠️ Rate limited:', currentSession);
         observer.error({
           code: 'rate-limited',
           message: 'Too many attempts. Please wait before requesting another OTP.'
@@ -82,21 +85,27 @@ export class OtpService {
 
       // Format phone number
       const formattedPhone = this.formatPhoneNumber(phoneNumber);
+      console.log('📱 Formatted phone number:', formattedPhone);
       
       if (!this.recaptchaVerifier) {
+        console.log('🤖 Initializing reCAPTCHA...');
         this.initializeRecaptcha();
       }
 
       if (!this.recaptchaVerifier) {
+        console.error('❌ reCAPTCHA initialization failed');
         observer.error({
           code: 'recaptcha-error',
-          message: 'Failed to initialize reCAPTCHA. Please refresh the page.'
+          message: 'Failed to initialize reCAPTCHA. Please refresh the page and try again.'
         });
         return;
       }
 
+      console.log('🚀 Sending OTP via Firebase...', { formattedPhone });
+      
       signInWithPhoneNumber(this.auth, formattedPhone, this.recaptchaVerifier)
         .then((confirmationResult) => {
+          console.log('✅ OTP sent successfully:', confirmationResult);
           const session: OTPSession = {
             phoneNumber: formattedPhone,
             confirmationResult,
@@ -109,27 +118,50 @@ export class OtpService {
           observer.complete();
         })
         .catch((error) => {
-          console.error('Error sending OTP:', error);
-          let errorMessage = 'Failed to send OTP. Please try again.';
+          console.error('❌ Firebase OTP Error:', error);
+          console.error('Error details:', {
+            code: error.code,
+            message: error.message,
+            stack: error.stack
+          });
           
-          switch (error.code) {
-            case 'auth/invalid-phone-number':
-              errorMessage = 'Invalid phone number format.';
-              break;
-            case 'auth/too-many-requests':
-              errorMessage = 'Too many requests. Please try again later.';
-              break;
-            case 'auth/captcha-check-failed':
-              errorMessage = 'reCAPTCHA verification failed. Please try again.';
-              break;
-          }
+          let errorMessage = this.getDetailedErrorMessage(error);
           
           observer.error({
             code: error.code,
-            message: errorMessage
+            message: errorMessage,
+            originalError: error
           });
         });
     });
+  }
+
+  /**
+   * Get detailed error message based on Firebase error codes
+   */
+  private getDetailedErrorMessage(error: any): string {
+    switch (error.code) {
+      case 'auth/invalid-phone-number':
+        return 'Invalid phone number format. Please enter a valid Indian mobile number.';
+      case 'auth/too-many-requests':
+        return 'Too many requests. Please try again after some time.';
+      case 'auth/captcha-check-failed':
+        return 'reCAPTCHA verification failed. Please refresh the page and try again.';
+      case 'auth/quota-exceeded':
+        return 'SMS quota exceeded. Please try again later.';
+      case 'auth/invalid-app-credential':
+        return 'Invalid app configuration. Please contact support.';
+      case 'auth/app-not-authorized':
+        return 'Phone authentication is not enabled for this app.';
+      case 'auth/missing-phone-number':
+        return 'Phone number is required.';
+      case 'auth/invalid-verification-code':
+        return 'Invalid verification code.';
+      case 'auth/session-expired':
+        return 'Session expired. Please request a new OTP.';
+      default:
+        return `Failed to send OTP: ${error.message || 'Unknown error'}. Please try again.`;
+    }
   }
 
   /**

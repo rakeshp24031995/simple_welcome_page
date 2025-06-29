@@ -4,7 +4,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { Router, RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
 
-import { OtpService } from '../../services/otp.service';
+import { AdaptiveOtpService } from '../../services/adaptive-otp.service';
 import { AuthService } from '../../services/auth.service';
 import { OtpInput } from '../../../shared/components/otp-input/otp-input';
 
@@ -52,7 +52,7 @@ export class ForgotPassword implements OnInit, OnDestroy {
 
   constructor(
     private fb: FormBuilder,
-    private otpService: OtpService,
+    protected otpService: AdaptiveOtpService,
     private authService: AuthService,
     private router: Router
   ) {

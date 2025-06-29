@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 
 import { AuthService } from '../../services/auth.service';
-import { OtpService } from '../../services/otp.service';
+import { AdaptiveOtpService } from '../../services/adaptive-otp.service';
 import { OtpInput } from '../../../shared/components/otp-input/otp-input';
 
 interface RegistrationStep {
@@ -54,7 +54,7 @@ export class RegisterWithOtp implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private otpService: OtpService,
+    protected otpService: AdaptiveOtpService,
     private router: Router
   ) {
     this.registerForm = this.fb.group({
