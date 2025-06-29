@@ -1,0 +1,55 @@
+.otp-input-container {
+  @apply w-full max-w-md mx-auto;
+}
+
+.otp-inputs {
+  @apply flex justify-center space-x-2 sm:space-x-3 mb-6;
+}
+
+.otp-input {
+  @apply w-12 h-12 sm:w-14 sm:h-14 text-center text-lg sm:text-xl font-semibold 
+         border-2 border-gray-300 rounded-lg bg-white text-dark
+         focus:border-gold focus:ring-2 focus:ring-gold focus:ring-opacity-20 
+         transition-all duration-200 outline-none;
+}
+
+.otp-input.filled {
+  @apply border-gold bg-gold bg-opacity-10;
+}
+
+.otp-input.disabled {
+  @apply bg-gray-100 text-gray-400 cursor-not-allowed;
+}
+
+.otp-input:hover:not(.disabled) {
+  @apply border-gray-400;
+}
+
+.otp-actions {
+  @apply text-center;
+}
+
+.countdown-timer {
+  @apply flex items-center justify-center space-x-2 mb-4;
+}
+
+.resend-button {
+  @apply flex items-center justify-center space-x-2 text-gold hover:text-gold-600 
+         font-medium transition-colors duration-200 disabled:text-gray-400 
+         disabled:cursor-not-allowed mx-auto;
+}
+
+.resend-button:hover:not(:disabled) {
+  @apply underline;
+}
+
+/* Mobile optimizations */
+@media (max-width: 475px) {
+  .otp-inputs {
+    @apply space-x-1;
+  }
+  
+  .otp-input {
+    @apply w-10 h-10 text-base;
+  }
+}

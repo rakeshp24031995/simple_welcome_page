@@ -1,0 +1,43 @@
+<div class="otp-input-container">
+  <div class="otp-inputs">
+    <input
+      *ngFor="let value of otpValues; let i = index"
+      #otpInput
+      type="text"
+      inputmode="numeric"
+      pattern="[0-9]*"
+      maxlength="1"
+      [value]="value"
+      [disabled]="disabled"
+      (input)="onInputChange($event, i)"
+      (keydown)="onKeyDown($event, i)"
+      (paste)="onPaste($event)"
+      class="otp-input"
+      [class.filled]="value"
+      [class.disabled]="disabled"
+      autocomplete="one-time-code"
+    >
+  </div>
+  
+  <div class="otp-actions" *ngIf="showResend || countdown > 0">
+    <div *ngIf="countdown > 0" class="countdown-timer">
+      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+      <span class="text-sm text-gray-500">Resend OTP in {{ countdown }}s</span>
+    </div>
+    
+    <button
+      *ngIf="showResend"
+      type="button"
+      (click)="resendOtp()"
+      class="resend-button"
+      [disabled]="disabled"
+    >
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+      </svg>
+      Resend OTP
+    </button>
+  </div>
+</div>

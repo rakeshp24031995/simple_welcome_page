@@ -1,0 +1,304 @@
+<div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+  <div class="sm:mx-auto sm:w-full sm:max-w-md">
+    <!-- Logo/Brand -->
+    <div class="text-center mb-8">
+      <h1 class="text-3xl font-bold">
+        <span class="text-dark font-light tracking-wider">Clean</span>
+        <span class="text-gold font-black tracking-tight">Cut</span>
+        <span class="text-dark font-light tracking-wider ml-2">Lounge</span>
+      </h1>
+    </div>
+
+    <!-- Step Indicator -->
+    <div class="flex justify-center mb-8">
+      <div class="flex items-center space-x-4">
+        <div *ngFor="let step of steps; let i = index" class="flex items-center">
+          <div class="flex items-center">
+            <div [class]="'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ' + 
+                         (currentStep === step.step ? 'bg-gold text-dark' : 
+                          steps.findIndex(s => s.step === currentStep) > i ? 'bg-green-500 text-white' : 
+                          'bg-gray-200 text-gray-500')">
+              <svg *ngIf="steps.findIndex(s => s.step === currentStep) > i" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span *ngIf="steps.findIndex(s => s.step === currentStep) <= i">{{ i + 1 }}</span>
+            </div>
+          </div>
+          <div *ngIf="i < steps.length - 1" 
+               [class]="'w-8 h-0.5 mx-2 ' + 
+                        (steps.findIndex(s => s.step === currentStep) > i ? 'bg-green-500' : 'bg-gray-200')">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="bg-white py-8 px-4 shadow-lg sm:rounded-lg sm:px-10">
+      <!-- Header -->
+      <div class="text-center mb-8">
+        <h2 class="text-2xl font-bold text-gray-900">{{ currentStepData.title }}</h2>
+        <p class="mt-2 text-sm text-gray-600">{{ currentStepData.description }}</p>
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="errorMessage" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+        <div class="flex items-center">
+          <svg class="w-5 h-5 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span class="text-red-800 text-sm">{{ errorMessage }}</span>
+        </div>
+      </div>
+
+      <!-- Success Message -->
+      <div *ngIf="successMessage" class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+        <div class="flex items-center">
+          <svg class="w-5 h-5 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span class="text-green-800 text-sm">{{ successMessage }}</span>
+        </div>
+      </div>
+
+      <!-- Step 1: Registration Form -->
+      <form *ngIf="currentStep === 'form'" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <div class="space-y-6">
+          <!-- Display Name -->
+          <div>
+            <label for="displayName" class="block text-sm font-medium text-gray-700 mb-2">
+              Full Name
+            </label>
+            <input
+              type="text"
+              id="displayName"
+              formControlName="displayName"
+              placeholder="Enter your full name"
+              class="form-input"
+              [class.border-red-300]="displayNameControl?.invalid && displayNameControl?.touched"
+            >
+            <div *ngIf="displayNameControl?.invalid && displayNameControl?.touched" class="mt-1 text-sm text-red-600">
+              <span *ngIf="displayNameControl?.errors?.['required']">Full name is required</span>
+              <span *ngIf="displayNameControl?.errors?.['minlength']">Name must be at least 2 characters</span>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div>
+            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+              Email Address
+            </label>
+            <input
+              type="email"
+              id="email"
+              formControlName="email"
+              placeholder="Enter your email"
+              class="form-input"
+              [class.border-red-300]="emailControl?.invalid && emailControl?.touched"
+            >
+            <div *ngIf="emailControl?.invalid && emailControl?.touched" class="mt-1 text-sm text-red-600">
+              <span *ngIf="emailControl?.errors?.['required']">Email is required</span>
+              <span *ngIf="emailControl?.errors?.['email']">Please enter a valid email</span>
+            </div>
+          </div>
+
+          <!-- Phone Number -->
+          <div>
+            <label for="phoneNumber" class="block text-sm font-medium text-gray-700 mb-2">
+              Mobile Number
+            </label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <span class="text-gray-500 text-sm">+91</span>
+              </div>
+              <input
+                type="tel"
+                id="phoneNumber"
+                formControlName="phoneNumber"
+                placeholder="9876543210"
+                class="form-input pl-12"
+                [class.border-red-300]="phoneControl?.invalid && phoneControl?.touched"
+                maxlength="10"
+                pattern="[0-9]*"
+                inputmode="numeric"
+              >
+            </div>
+            <div *ngIf="phoneControl?.invalid && phoneControl?.touched" class="mt-1 text-sm text-red-600">
+              <span *ngIf="phoneControl?.errors?.['required']">Mobile number is required</span>
+              <span *ngIf="phoneControl?.errors?.['pattern']">Please enter a valid 10-digit mobile number</span>
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+              Password
+            </label>
+            <div class="relative">
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                id="password"
+                formControlName="password"
+                placeholder="Create a password"
+                class="form-input pr-12"
+                [class.border-red-300]="passwordControl?.invalid && passwordControl?.touched"
+              >
+              <button
+                type="button"
+                (click)="togglePasswordVisibility()"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center"
+              >
+                <svg *ngIf="!showPassword" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                <svg *ngIf="showPassword" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                </svg>
+              </button>
+            </div>
+            <div *ngIf="passwordControl?.invalid && passwordControl?.touched" class="mt-1 text-sm text-red-600">
+              <span *ngIf="passwordControl?.errors?.['required']">Password is required</span>
+              <span *ngIf="passwordControl?.errors?.['minlength']">Password must be at least 6 characters</span>
+            </div>
+          </div>
+
+          <!-- Confirm Password -->
+          <div>
+            <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-2">
+              Confirm Password
+            </label>
+            <div class="relative">
+              <input
+                [type]="showConfirmPassword ? 'text' : 'password'"
+                id="confirmPassword"
+                formControlName="confirmPassword"
+                placeholder="Confirm your password"
+                class="form-input pr-12"
+                [class.border-red-300]="confirmPasswordControl?.invalid && confirmPasswordControl?.touched"
+              >
+              <button
+                type="button"
+                (click)="toggleConfirmPasswordVisibility()"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center"
+              >
+                <svg *ngIf="!showConfirmPassword" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                <svg *ngIf="showConfirmPassword" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                </svg>
+              </button>
+            </div>
+            <div *ngIf="confirmPasswordControl?.invalid && confirmPasswordControl?.touched" class="mt-1 text-sm text-red-600">
+              <span *ngIf="confirmPasswordControl?.errors?.['required']">Please confirm your password</span>
+            </div>
+            <div *ngIf="registerForm.errors?.['passwordMismatch'] && confirmPasswordControl?.touched" class="mt-1 text-sm text-red-600">
+              Passwords do not match
+            </div>
+          </div>
+
+          <!-- Terms Agreement -->
+          <div>
+            <div class="flex items-start">
+              <input
+                type="checkbox"
+                id="agreeToTerms"
+                formControlName="agreeToTerms"
+                class="mt-1 w-4 h-4 text-gold border-gray-300 rounded focus:ring-gold focus:ring-2"
+                [class.border-red-300]="agreeToTermsControl?.invalid && agreeToTermsControl?.touched"
+              >
+              <label for="agreeToTerms" class="ml-3 text-sm text-gray-600">
+                I agree to the <a href="/terms" class="text-gold hover:text-gold-600 font-medium">Terms of Service</a> 
+                and <a href="/privacy" class="text-gold hover:text-gold-600 font-medium">Privacy Policy</a>
+              </label>
+            </div>
+            <div *ngIf="agreeToTermsControl?.invalid && agreeToTermsControl?.touched" class="mt-1 text-sm text-red-600">
+              Please agree to the terms and conditions
+            </div>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          [disabled]="registerForm.invalid || isLoading"
+          class="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center mt-6"
+        >
+          <svg *ngIf="isLoading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-dark" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          {{ isLoading ? 'Sending OTP...' : 'Send OTP' }}
+        </button>
+      </form>
+
+      <!-- Step 2: OTP Verification -->
+      <div *ngIf="currentStep === 'otp'" class="text-center">
+        <div class="mb-6">
+          <p class="text-sm text-gray-600 mb-4">
+            Enter the 6-digit OTP sent to <strong>+91-{{ registrationData?.phoneNumber }}</strong>
+          </p>
+          <app-otp-input
+            [length]="6"
+            [disabled]="isLoading"
+            (otpComplete)="onOtpComplete($event)"
+          ></app-otp-input>
+        </div>
+
+        <button
+          type="button"
+          (click)="onResendOtp()"
+          [disabled]="isLoading"
+          class="text-gold hover:text-gold-600 font-medium text-sm disabled:text-gray-400"
+        >
+          {{ isLoading ? 'Sending...' : 'Resend OTP' }}
+        </button>
+      </div>
+
+      <!-- Step 3: Success -->
+      <div *ngIf="currentStep === 'success'" class="text-center">
+        <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
+          <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Account Created Successfully!</h3>
+        <p class="text-sm text-gray-600 mb-6">
+          Welcome to Clean Cut Lounge! You'll be redirected to your dashboard shortly.
+        </p>
+        <div class="flex items-center justify-center">
+          <svg class="animate-spin h-5 w-5 text-gold mr-2" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span class="text-sm text-gray-600">Redirecting...</span>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <div *ngIf="currentStep !== 'success'" class="mt-8 flex items-center justify-between">
+        <button
+          type="button"
+          (click)="goBack()"
+          class="flex items-center text-gray-600 hover:text-gray-800 font-medium text-sm"
+        >
+          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          {{ currentStep === 'form' ? 'Back to Login' : 'Back' }}
+        </button>
+
+        <button
+          type="button"
+          (click)="goToLogin()"
+          class="text-gold hover:text-gold-600 font-medium text-sm"
+        >
+          Already have an account?
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- reCAPTCHA container -->
+  <div id="recaptcha-container"></div>
+</div>

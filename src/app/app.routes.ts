@@ -14,7 +14,12 @@ export const routes: Routes = [
   {
     path: 'register',
     canActivate: [guestGuard],
-    loadComponent: () => import('./auth/components/register/register').then(m => m.Register)
+    loadComponent: () => import('./auth/components/register/register-with-otp').then(m => m.RegisterWithOtp)
+  },
+  {
+    path: 'forgot-password',
+    canActivate: [guestGuard],
+    loadComponent: () => import('./auth/components/forgot-password/forgot-password').then(m => m.ForgotPassword)
   },
   {
     path: 'profile',

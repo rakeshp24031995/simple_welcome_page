@@ -78,6 +78,13 @@
             <span *ngIf="loginForm.get('password')?.errors?.['required']">Password is required</span>
             <span *ngIf="loginForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters</span>
           </div>
+          
+          <!-- Forgot Password Link -->
+          <div class="text-right mt-2">
+            <a routerLink="/forgot-password" class="text-sm text-gold hover:text-gold-600 font-medium transition-colors duration-300">
+              Forgot Password?
+            </a>
+          </div>
         </div>
 
         <!-- Error Message -->

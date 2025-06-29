@@ -163,4 +163,21 @@ export class FirebaseService {
     }
     return new Date(timestamp);
   }
+
+  // Get current authenticated user
+  getCurrentUser(): FirebaseUser | null {
+    return this.auth.currentUser;
+  }
+
+  // Get Auth instance for OTP service
+  getAuth(): Auth {
+    return this.auth;
+  }
+
+  // Query documents with condition
+  async queryDocuments(collectionName: string, field: string, operator: any, value: any): Promise<any[]> {
+    const q = query(collection(this.firestore, collectionName), where(field, operator, value));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  }
 }

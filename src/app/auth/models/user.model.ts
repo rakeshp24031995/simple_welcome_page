@@ -6,6 +6,8 @@ export interface User {
   phoneNumber?: string;
   createdAt: Date;
   isEmailVerified: boolean;
+  isPhoneVerified?: boolean;
+  phoneVerifiedAt?: Date;
 }
 
 export interface AuthState {

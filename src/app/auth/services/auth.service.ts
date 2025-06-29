@@ -3,6 +3,7 @@ import { BehaviorSubject, Observable, of, throwError, from } from 'rxjs';
 import { map, catchError, switchMap } from 'rxjs/operators';
 import { User, LoginCredentials, RegisterData } from '../models/user.model';
 import { FirebaseService } from '../../core/services/firebase.service';
+import { updatePassword } from 'firebase/auth';
 
 @Injectable({
   providedIn: 'root'
@@ -205,6 +206,86 @@ export class AuthService {
   hasOwnerAccess(): boolean {
     const user = this.getCurrentUser();
     return user?.role === 'owner' || user?.role === 'admin';
+  }
+
+  /**
+   * Reset password using phone number verification
+   */
+  resetPasswordWithPhone(phoneNumber: string, newPassword: string): Observable<boolean> {
+    return new Observable(observer => {
+      this.findUserByPhone(phoneNumber).then(user => {
+        if (!user) {
+          observer.error({ message: 'User not found with this phone number' });
+          return;
+        }
+
+        // Update password in Firebase Auth (assuming user is already signed in via OTP)
+        const currentFirebaseUser = this.firebaseService.getCurrentUser();
+        if (currentFirebaseUser) {
+          updatePassword(currentFirebaseUser, newPassword).then(() => {
+            observer.next(true);
+            observer.complete();
+          }).catch(error => {
+            console.error('Error updating password:', error);
+            observer.error({ message: 'Failed to update password' });
+          });
+        } else {
+          observer.error({ message: 'Authentication required' });
+        }
+      }).catch(error => {
+        console.error('Error finding user:', error);
+        observer.error({ message: 'Failed to find user' });
+      });
+    });
+  }
+
+  /**
+   * Find user by phone number
+   */
+  private async findUserByPhone(phoneNumber: string): Promise<any> {
+    try {
+      const formattedPhone = phoneNumber.startsWith('+91') ? phoneNumber : `+91${phoneNumber}`;
+      const users = await this.firebaseService.queryDocuments('users', 'phoneNumber', '==', formattedPhone);
+      return users.length > 0 ? users[0] : null;
+    } catch (error) {
+      console.error('Error finding user by phone:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Register with OTP verification
+   */
+  registerWithOTP(userData: RegisterData, isPhoneVerified: boolean = false): Observable<User> {
+    if (!isPhoneVerified) {
+      return throwError(() => ({ message: 'Phone number must be verified before registration' }));
+    }
+
+    return this.register(userData).pipe(
+      switchMap(async (user) => {
+        // Mark phone as verified in user profile
+        await this.firebaseService.updateDocument('users', user.uid, {
+          isPhoneVerified: true,
+          phoneVerifiedAt: new Date()
+        });
+        return user;
+      })
+    );
+  }
+
+  /**
+   * Verify if user needs OTP verification for login
+   */
+  requiresOTPVerification(email: string): Observable<boolean> {
+    return from(this.firebaseService.queryDocuments('users', 'email', '==', email)).pipe(
+      map(users => {
+        if (users.length === 0) return false;
+        const user = users[0];
+        // Require OTP if phone is registered but not verified
+        return user.phoneNumber && !user.isPhoneVerified;
+      }),
+      catchError(() => of(false))
+    );
   }
 
   // Create admin user (should be called during app initialization)
