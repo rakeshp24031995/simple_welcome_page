@@ -1,5 +1,6 @@
 export const environment = {
   production: true,
+  useMockOTP: false, // Always use real Firebase in production
   firebase: {
     apiKey: "AIzaSyDfd3IrS0suW7oVGxH7xOcD_sPZv0kyUg4",
     authDomain: "clean-cut-4c327.firebaseapp.com",

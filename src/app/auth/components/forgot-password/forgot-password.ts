@@ -45,8 +45,8 @@ export class ForgotPassword implements OnInit, OnDestroy {
     },
     {
       step: 'password',
-      title: 'New Password',
-      description: 'Create a new password for your account'
+      title: 'Reset Password',
+      description: 'We will send a password reset link to your registered email'
     }
   ];
 
@@ -245,32 +245,30 @@ export class ForgotPassword implements OnInit, OnDestroy {
   }
 
   onPasswordSubmit(): void {
-    if (this.passwordForm.invalid || this.isLoading) return;
+    if (this.isLoading) return;
 
-    console.log('🔒 Starting password reset for phone:', this.phoneNumber);
+    console.log('🔒 Starting password reset email for phone:', this.phoneNumber);
     this.isLoading = true;
     this.errorMessage = '';
 
-    const newPassword = this.passwordControl?.value;
-    console.log('🔑 New password length:', newPassword?.length);
-
-    const subscription = this.authService.resetPasswordWithPhone(this.phoneNumber, newPassword).subscribe({
+    // No need for new password since we're using email-based reset
+    const subscription = this.authService.resetPasswordWithPhone(this.phoneNumber, '').subscribe({
       next: (success) => {
-        console.log('✅ Password reset result:', success);
+        console.log('✅ Password reset email result:', success);
         if (success) {
-          console.log('🎉 Password reset successful, redirecting to login');
-          this.successMessage = 'Password reset successfully!';
+          console.log('🎉 Password reset email sent, redirecting to login');
+          this.successMessage = 'Password reset email sent! Please check your email and follow the instructions to reset your password.';
           setTimeout(() => {
             this.router.navigate(['/login'], { 
-              queryParams: { message: 'Password reset successfully. Please login with your new password.' }
+              queryParams: { message: 'Password reset email sent. Please check your email to complete the process.' }
             });
-          }, 2000);
+          }, 3000);
         }
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('❌ Password reset failed:', error);
-        this.errorMessage = error.message || error || 'Failed to reset password. Please try again.';
+        console.error('❌ Password reset email failed:', error);
+        this.errorMessage = error.message || error || 'Failed to send password reset email. Please try again.';
         this.isLoading = false;
       }
     });

@@ -7,6 +7,7 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   updateProfile,
+  sendPasswordResetEmail,
   User as FirebaseUser,
   onAuthStateChanged
 } from 'firebase/auth';
@@ -174,5 +175,10 @@ export class FirebaseService {
     const q = query(collection(this.firestore, collectionName), where(field, operator, value));
     const querySnapshot = await getDocs(q);
     return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  }
+
+  // Send password reset email
+  async sendPasswordResetEmail(email: string): Promise<void> {
+    return sendPasswordResetEmail(this.auth, email);
   }
 }

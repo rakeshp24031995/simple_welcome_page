@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
-  useMockOTP: true, // Set to true for development when Firebase phone auth is not configured
+  useMockOTP: false, // Set to false to use real Firebase phone authentication
   firebase: {
     apiKey: "AIzaSyDfd3IrS0suW7oVGxH7xOcD_sPZv0kyUg4",
     authDomain: "clean-cut-4c327.firebaseapp.com",
