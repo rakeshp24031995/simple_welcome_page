@@ -133,13 +133,20 @@ export class OtpInput implements OnInit, AfterViewInit, OnDestroy {
   private emitOtpChange(): void {
     const otp = this.otpValues.join('');
     console.log(`📡 OTP Change - Current: "${otp}", Length: ${otp.length}, Target: ${this.length}`);
+    console.log(`📡 OTP Values Array:`, this.otpValues);
     this.otpChange.emit(otp);
     
-    if (otp.length === this.length && !otp.includes('')) {
+    // Check if all positions are filled (no empty strings)
+    const isComplete = this.otpValues.every(value => value !== '' && value !== null && value !== undefined);
+    const hasCorrectLength = otp.length === this.length;
+    
+    console.log(`🔍 OTP Complete Check: isComplete=${isComplete}, hasCorrectLength=${hasCorrectLength}`);
+    
+    if (isComplete && hasCorrectLength) {
       console.log(`🎯 OTP Complete! Emitting: "${otp}"`);
       this.otpComplete.emit(otp);
     } else {
-      console.log(`⏳ OTP Incomplete - Length: ${otp.length}/${this.length}, Has Empty: ${otp.includes('')}`);
+      console.log(`⏳ OTP Incomplete - IsComplete: ${isComplete}, Length: ${otp.length}/${this.length}`);
     }
   }
 
