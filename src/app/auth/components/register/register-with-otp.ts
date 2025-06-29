@@ -213,17 +213,25 @@ export class RegisterWithOtp implements OnInit, OnDestroy {
   onOtpComplete(otp: string): void {
     if (this.isLoading) return;
 
+    console.log('🔢 OTP Complete called with:', otp);
     this.isLoading = true;
     this.errorMessage = '';
 
     const subscription = this.otpService.verifyOTP(otp).subscribe({
       next: (result) => {
+        console.log('✅ OTP Verification Result:', result);
         if (result.success) {
+          console.log('🚀 Phone verified, creating account...');
           // Phone verified, now create account
           this.createAccount();
+        } else {
+          console.error('❌ OTP verification failed:', result);
+          this.errorMessage = 'OTP verification failed. Please try again.';
+          this.isLoading = false;
         }
       },
       error: (error) => {
+        console.error('❌ OTP Verification Error:', error);
         this.errorMessage = error.message || 'Invalid OTP. Please try again.';
         this.isLoading = false;
       }
@@ -233,8 +241,11 @@ export class RegisterWithOtp implements OnInit, OnDestroy {
   }
 
   private createAccount(): void {
+    console.log('🏗️ Creating account with data:', this.registrationData);
+    
     const subscription = this.authService.registerWithOTP(this.registrationData, true).subscribe({
       next: (user) => {
+        console.log('✅ Account created successfully:', user);
         this.currentStep = 'success';
         this.successMessage = 'Account created successfully!';
         this.isLoading = false;
@@ -245,7 +256,8 @@ export class RegisterWithOtp implements OnInit, OnDestroy {
         }, 2000);
       },
       error: (error) => {
-        this.errorMessage = error.message || 'Failed to create account. Please try again.';
+        console.error('❌ Account creation failed:', error);
+        this.errorMessage = error.message || error || 'Failed to create account. Please try again.';
         this.isLoading = false;
       }
     });
