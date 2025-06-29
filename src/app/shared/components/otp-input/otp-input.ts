@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, ViewChildren, QueryList, ElementRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, AfterViewInit, ViewChildren, QueryList, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -8,7 +8,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './otp-input.html',
   styleUrl: './otp-input.css'
 })
-export class OtpInput implements OnInit, OnDestroy {
+export class OtpInput implements OnInit, AfterViewInit, OnDestroy {
   @Input() length: number = 6;
   @Input() disabled: boolean = false;
   @Input() autoFocus: boolean = true;
@@ -27,6 +27,14 @@ export class OtpInput implements OnInit, OnDestroy {
     this.startCountdown();
   }
 
+  ngAfterViewInit(): void {
+    if (this.autoFocus) {
+      setTimeout(() => {
+        this.focus();
+      }, 100);
+    }
+  }
+
   ngOnDestroy(): void {
     if (this.timer) {
       clearInterval(this.timer);
@@ -36,21 +44,32 @@ export class OtpInput implements OnInit, OnDestroy {
   onInputChange(event: any, index: number): void {
     if (this.disabled) return;
 
-    const value = event.target.value;
+    let value = event.target.value;
+    console.log(`🔢 OTP Input [${index}]: "${value}"`);
+    
+    // Only allow numeric values
+    value = value.replace(/\D/g, '');
     
     // Only allow single digit
     if (value.length > 1) {
-      event.target.value = value.slice(-1);
+      value = value.slice(-1);
     }
 
-    this.otpValues[index] = event.target.value;
+    // Update the model and the input
+    this.otpValues[index] = value;
+    event.target.value = value;
+    
+    console.log(`✅ OTP Updated [${index}]: "${value}", Array: [${this.otpValues.join(', ')}]`);
     
     // Move to next input if current is filled
-    if (event.target.value && index < this.length - 1) {
-      const nextInput = this.otpInputs.toArray()[index + 1];
-      if (nextInput) {
-        nextInput.nativeElement.focus();
-      }
+    if (value && index < this.length - 1) {
+      setTimeout(() => {
+        const nextInput = this.otpInputs.toArray()[index + 1];
+        if (nextInput) {
+          nextInput.nativeElement.focus();
+          nextInput.nativeElement.select();
+        }
+      }, 10);
     }
 
     this.emitOtpChange();
@@ -121,7 +140,14 @@ export class OtpInput implements OnInit, OnDestroy {
   }
 
   clear(): void {
+    console.log('🧹 Clearing OTP inputs');
     this.otpValues = new Array(this.length).fill('');
+    
+    // Clear all input values manually
+    this.otpInputs.forEach((input, index) => {
+      input.nativeElement.value = '';
+    });
+    
     const firstInput = this.otpInputs.toArray()[0];
     if (firstInput) {
       firstInput.nativeElement.focus();

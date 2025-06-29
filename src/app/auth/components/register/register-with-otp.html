@@ -1,5 +1,5 @@
 <div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-  <div class="sm:mx-auto sm:w-full sm:max-w-md">
+  <div class="sm:mx-auto sm:w-full sm:max-w-lg">
     <!-- Logo/Brand -->
     <div class="text-center mb-8">
       <h1 class="text-3xl font-bold">
@@ -11,14 +11,14 @@
 
     <!-- Step Indicator -->
     <div class="flex justify-center mb-8">
-      <div class="flex items-center space-x-4">
+      <div class="flex items-center space-x-3 sm:space-x-4">
         <div *ngFor="let step of steps; let i = index" class="flex items-center">
           <div class="flex items-center">
             <div [class]="getStepClasses(step, i)">
-              <svg *ngIf="isStepCompleted(i)" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg *ngIf="isStepCompleted(i)" class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
               </svg>
-              <span *ngIf="!isStepCompleted(i)">{{ i + 1 }}</span>
+              <span *ngIf="!isStepCompleted(i)" class="text-xs sm:text-sm">{{ i + 1 }}</span>
             </div>
           </div>
           <div *ngIf="i < steps.length - 1" [class]="getConnectorClasses(i)">
@@ -28,10 +28,10 @@
     </div>
 
     <!-- Main Content -->
-    <div class="bg-white py-8 px-4 shadow-lg sm:rounded-lg sm:px-10">
+    <div class="bg-white py-6 px-4 shadow-lg sm:rounded-lg sm:px-8 sm:py-8">
       <!-- Header -->
-      <div class="text-center mb-8">
-        <h2 class="text-2xl font-bold text-gray-900">{{ currentStepData.title }}</h2>
+      <div class="text-center mb-6">
+        <h2 class="text-xl sm:text-2xl font-bold text-gray-900">{{ currentStepData.title }}</h2>
         <p class="mt-2 text-sm text-gray-600">{{ currentStepData.description }}</p>
       </div>
 
@@ -232,7 +232,7 @@
         <button
           type="submit"
           [disabled]="registerForm.invalid || isLoading"
-          class="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center mt-6"
+          class="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center mt-8"
         >
           <svg *ngIf="isLoading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-dark" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -244,25 +244,36 @@
 
       <!-- Step 2: OTP Verification -->
       <div *ngIf="currentStep === 'otp'" class="text-center">
-        <div class="mb-6">
-          <p class="text-sm text-gray-600 mb-4">
-            Enter the 6-digit OTP sent to <strong>+91-{{ registrationData?.phoneNumber }}</strong>
+        <div class="mb-8">
+          <p class="text-sm text-gray-600 mb-6 leading-relaxed">
+            Enter the 6-digit OTP sent to<br>
+            <strong class="text-gray-800">+91-{{ registrationData?.phoneNumber }}</strong>
           </p>
-          <app-otp-input
-            [length]="6"
-            [disabled]="isLoading"
-            (otpComplete)="onOtpComplete($event)"
-          ></app-otp-input>
+          <div class="flex justify-center mb-6">
+            <app-otp-input
+              [length]="6"
+              [disabled]="isLoading"
+              [autoFocus]="true"
+              (otpComplete)="onOtpComplete($event)"
+              (otpChange)="onOtpChange($event)"
+            ></app-otp-input>
+          </div>
         </div>
 
-        <button
-          type="button"
-          (click)="onResendOtp()"
-          [disabled]="isLoading"
-          class="text-gold hover:text-gold-600 font-medium text-sm disabled:text-gray-400"
-        >
-          {{ isLoading ? 'Sending...' : 'Resend OTP' }}
-        </button>
+        <div class="space-y-3">
+          <button
+            type="button"
+            (click)="onResendOtp()"
+            [disabled]="isLoading"
+            class="text-gold hover:text-gold-600 font-medium text-sm disabled:text-gray-400 transition-colors duration-200"
+          >
+            {{ isLoading ? 'Sending...' : 'Resend OTP' }}
+          </button>
+          
+          <p class="text-xs text-gray-500">
+            Didn't receive the code? Check your SMS or try resending.
+          </p>
+        </div>
       </div>
 
       <!-- Step 3: Success -->
@@ -286,7 +297,7 @@
       </div>
 
       <!-- Navigation -->
-      <div *ngIf="currentStep !== 'success'" class="mt-8 flex items-center justify-between">
+      <div *ngIf="currentStep !== 'success'" class="mt-6 sm:mt-8 flex items-center justify-between">
         <button
           type="button"
           (click)="goBack()"

@@ -202,6 +202,14 @@ export class RegisterWithOtp implements OnInit, OnDestroy {
     }
   }
 
+  onOtpChange(otp: string): void {
+    // This method can be used to track OTP input changes if needed
+    // For now, we'll just clear any existing error messages
+    if (this.errorMessage) {
+      this.errorMessage = '';
+    }
+  }
+
   onOtpComplete(otp: string): void {
     if (this.isLoading) return;
 

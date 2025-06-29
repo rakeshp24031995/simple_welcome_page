@@ -1,5 +1,5 @@
 .otp-input-container {
-  @apply w-full max-w-md mx-auto;
+  @apply w-full max-w-sm mx-auto;
 }
 
 .otp-inputs {
@@ -10,7 +10,14 @@
   @apply w-12 h-12 sm:w-14 sm:h-14 text-center text-lg sm:text-xl font-semibold 
          border-2 border-gray-300 rounded-lg bg-white text-dark
          focus:border-gold focus:ring-2 focus:ring-gold focus:ring-opacity-20 
-         transition-all duration-200 outline-none;
+         transition-all duration-200 outline-none appearance-none;
+  
+  /* Ensure proper text alignment and input behavior */
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+  letter-spacing: 0;
+  
+  /* Fix iOS zoom issues */
+  font-size: max(16px, 1rem);
 }
 
 .otp-input.filled {
