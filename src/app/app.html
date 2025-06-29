@@ -17,9 +17,8 @@
       <li><a routerLink="/" fragment="contact" class="hover:text-gold transition-colors duration-300">Contact</a></li>
     </ul>
     
-    <!-- Mobile Menu Button -->
-    <button *ngIf="!(currentUser$ | async)" 
-            (click)="toggleMobileMenu($event)" 
+    <!-- Mobile Menu Button - Always show on mobile -->
+    <button (click)="toggleMobileMenu($event)" 
             class="md:hidden text-white p-2 hover:text-gold transition-colors duration-300"
             aria-label="Toggle mobile menu">
       <svg *ngIf="!showMobileMenu" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -250,18 +249,76 @@
         </li>
       </ul>
       
-      <!-- Mobile Auth Buttons -->
+      <!-- Mobile Auth/User Buttons -->
       <div class="mt-8 space-y-4">
-        <a routerLink="/login" 
-           (click)="closeMobileMenu()"
-           class="block w-full py-3 px-4 text-center bg-transparent border-2 border-gold text-gold hover:bg-gold hover:text-dark transition-all duration-300 rounded-lg font-semibold">
-          Sign In
-        </a>
-        <a routerLink="/register" 
-           (click)="closeMobileMenu()"
-           class="block w-full py-3 px-4 text-center bg-gold text-dark hover:bg-yellow-400 transition-all duration-300 rounded-lg font-semibold">
-          Book Now
-        </a>
+        <!-- Guest User Buttons -->
+        <div *ngIf="!(currentUser$ | async)" class="space-y-4">
+          <a routerLink="/login" 
+             (click)="closeMobileMenu()"
+             class="block w-full py-3 px-4 text-center bg-transparent border-2 border-gold text-gold hover:bg-gold hover:text-dark transition-all duration-300 rounded-lg font-semibold">
+            Sign In
+          </a>
+          <a routerLink="/register" 
+             (click)="closeMobileMenu()"
+             class="block w-full py-3 px-4 text-center bg-gold text-dark hover:bg-yellow-400 transition-all duration-300 rounded-lg font-semibold">
+            Book Now
+          </a>
+        </div>
+
+        <!-- Authenticated User Options -->
+        <div *ngIf="currentUser$ | async as user" class="space-y-4">
+          <!-- User Info -->
+          <div class="text-center py-4 border-b border-gray-600">
+            <div class="w-12 h-12 bg-gold rounded-full flex items-center justify-center text-dark font-bold mx-auto mb-2">
+              {{ user.displayName.charAt(0).toUpperCase() }}
+            </div>
+            <p class="text-white font-semibold">{{ user.displayName }}</p>
+            <p class="text-gray-400 text-sm">{{ user.email }}</p>
+          </div>
+
+          <!-- Role-based Quick Actions -->
+          <a *ngIf="user.role === 'customer'" 
+             routerLink="/book-appointment" 
+             (click)="closeMobileMenu()"
+             class="block w-full py-3 px-4 text-center bg-gold text-dark hover:bg-yellow-400 transition-all duration-300 rounded-lg font-semibold">
+            Book Appointment
+          </a>
+          <a *ngIf="user.role === 'owner'" 
+             routerLink="/owner-dashboard" 
+             (click)="closeMobileMenu()"
+             class="block w-full py-3 px-4 text-center bg-gold text-dark hover:bg-yellow-400 transition-all duration-300 rounded-lg font-semibold">
+            Owner Dashboard
+          </a>
+          <a *ngIf="user.role === 'admin'" 
+             routerLink="/admin" 
+             (click)="closeMobileMenu()"
+             class="block w-full py-3 px-4 text-center bg-gold text-dark hover:bg-yellow-400 transition-all duration-300 rounded-lg font-semibold">
+            Admin Panel
+          </a>
+
+          <!-- Common User Actions -->
+          <a routerLink="/dashboard" 
+             (click)="closeMobileMenu()"
+             class="block w-full py-3 px-4 text-center bg-transparent border-2 border-gold text-gold hover:bg-gold hover:text-dark transition-all duration-300 rounded-lg font-semibold">
+            My Dashboard
+          </a>
+          <a routerLink="/my-bookings" 
+             (click)="closeMobileMenu()"
+             class="block w-full py-3 px-4 text-center bg-transparent border border-gray-600 text-white hover:bg-gray-700 transition-all duration-300 rounded-lg font-semibold">
+            My Bookings
+          </a>
+          <a routerLink="/profile" 
+             (click)="closeMobileMenu()"
+             class="block w-full py-3 px-4 text-center bg-transparent border border-gray-600 text-white hover:bg-gray-700 transition-all duration-300 rounded-lg font-semibold">
+            Profile
+          </a>
+
+          <!-- Logout Button -->
+          <button (click)="logout(); closeMobileMenu()" 
+                  class="block w-full py-3 px-4 text-center bg-red-600 text-white hover:bg-red-700 transition-all duration-300 rounded-lg font-semibold">
+            Sign Out
+          </button>
+        </div>
       </div>
     </nav>
   </div>

@@ -57,7 +57,20 @@ export class Login implements OnInit {
         },
         error: (error) => {
           this.isLoading = false;
-          this.errorMessage = error || 'An error occurred during login';
+          console.error('Login error:', error);
+          
+          // User-friendly error messages
+          if (error.includes('user-not-found')) {
+            this.errorMessage = 'No account found with this email address.';
+          } else if (error.includes('wrong-password') || error.includes('invalid-credential')) {
+            this.errorMessage = 'Invalid email or password.';
+          } else if (error.includes('too-many-requests')) {
+            this.errorMessage = 'Too many failed attempts. Please try again later.';
+          } else if (error.includes('network-request-failed')) {
+            this.errorMessage = 'Network error. Please check your connection.';
+          } else {
+            this.errorMessage = error || 'Unable to sign in. Please try again.';
+          }
         }
       });
     }

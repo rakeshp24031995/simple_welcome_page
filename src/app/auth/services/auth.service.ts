@@ -206,18 +206,22 @@ export class AuthService {
       const adminEmail = 'admin@cleancutlounge.com';
       const adminPassword = 'admin123';
       
+      console.log('Checking for existing admin user...');
+      
       // Check if admin already exists in Firestore
       try {
         const existingUsers = await this.firebaseService.getCollectionWhere('users', 'email', '==', adminEmail);
         if (existingUsers.length > 0) {
+          console.log('Admin user already exists in Firestore');
           return;
         }
       } catch (firestoreError) {
-        // Continue with creation if check fails
+        console.warn('Could not check existing users, continuing with creation:', firestoreError);
       }
 
       // Try to create Firebase auth user
       try {
+        console.log('Creating admin user in Firebase Auth...');
         const firebaseUser = await this.firebaseService.createUserWithEmail(adminEmail, adminPassword, 'System Administrator');
         
         // Create admin profile in Firestore
@@ -226,14 +230,37 @@ export class AuthService {
           email: adminEmail,
           phoneNumber: '+91 9738352239',
           role: 'admin' as const,
-          isActive: true
+          isActive: true,
+          createdAt: new Date()
         };
         
+        console.log('Creating admin profile in Firestore...');
         await this.firebaseService.createDocument('users', firebaseUser.uid, adminProfile);
+        console.log('Admin user created successfully');
       } catch (authError: any) {
         // If user already exists in Firebase Auth, that's fine
         if (authError.code === 'auth/email-already-in-use') {
           console.log('Admin user already exists in Firebase Auth');
+          
+          // Try to get the user and update Firestore profile if needed
+          try {
+            const userCredential = await this.firebaseService.signInWithEmail(adminEmail, adminPassword);
+            const adminProfile = {
+              displayName: 'System Administrator',
+              email: adminEmail,
+              phoneNumber: '+91 9738352239',
+              role: 'admin' as const,
+              isActive: true,
+              updatedAt: new Date()
+            };
+            await this.firebaseService.updateDocument('users', userCredential.uid, adminProfile);
+            console.log('Admin profile updated in Firestore');
+            
+            // Sign out after updating profile
+            await this.firebaseService.signOutUser();
+          } catch (updateError) {
+            console.warn('Could not update admin profile:', updateError);
+          }
           return;
         }
         throw authError;
