@@ -138,6 +138,7 @@ export class ForgotPassword implements OnInit, OnDestroy {
   async onPhoneSubmit(): Promise<void> {
     if (this.phoneForm.invalid || this.isLoading) return;
 
+    console.log('📱 Starting forgot password flow for phone:', this.phoneControl?.value);
     this.isLoading = true;
     this.errorMessage = '';
     this.successMessage = '';
@@ -147,17 +148,22 @@ export class ForgotPassword implements OnInit, OnDestroy {
 
     try {
       // First check if phone number is registered
+      console.log('🔍 Checking if phone number is registered:', phoneNumber);
       const isRegistered = await this.otpService.isPhoneNumberVerified(phoneNumber);
+      console.log('📞 Phone verification result:', isRegistered);
       
       if (!isRegistered) {
+        console.warn('❌ Phone number not found:', phoneNumber);
         this.errorMessage = 'Phone number not found. Please check the number or register for a new account.';
         this.isLoading = false;
         return;
       }
 
       // Send OTP
+      console.log('📤 Sending password reset OTP to:', phoneNumber);
       const subscription = this.otpService.sendPasswordResetOTP(phoneNumber).subscribe({
         next: (success) => {
+          console.log('✅ Password reset OTP sent successfully:', success);
           if (success) {
             this.currentStep = 'otp';
             this.successMessage = `OTP sent to +91-${phoneNumber}`;
@@ -165,6 +171,7 @@ export class ForgotPassword implements OnInit, OnDestroy {
           this.isLoading = false;
         },
         error: (error) => {
+          console.error('❌ Failed to send password reset OTP:', error);
           this.errorMessage = error.message || 'Failed to send OTP. Please try again.';
           this.isLoading = false;
         }
@@ -172,26 +179,41 @@ export class ForgotPassword implements OnInit, OnDestroy {
 
       this.subscriptions.add(subscription);
     } catch (error) {
+      console.error('❌ Error in forgot password flow:', error);
       this.errorMessage = 'An error occurred. Please try again.';
       this.isLoading = false;
+    }
+  }
+
+  onOtpChange(otp: string): void {
+    // Clear error messages when user starts typing OTP
+    if (this.errorMessage) {
+      this.errorMessage = '';
     }
   }
 
   onOtpComplete(otp: string): void {
     if (this.isLoading) return;
 
+    console.log('🔢 Password reset OTP complete called with:', otp);
     this.isLoading = true;
     this.errorMessage = '';
 
     const subscription = this.otpService.verifyPasswordResetOTP(otp).subscribe({
       next: (result) => {
+        console.log('✅ Password reset OTP verification result:', result);
         if (result.success) {
+          console.log('🚀 OTP verified, moving to password step');
           this.currentStep = 'password';
           this.successMessage = 'Phone number verified successfully';
+        } else {
+          console.error('❌ OTP verification failed:', result);
+          this.errorMessage = 'OTP verification failed. Please try again.';
         }
         this.isLoading = false;
       },
       error: (error) => {
+        console.error('❌ Password reset OTP verification error:', error);
         this.errorMessage = error.message || 'Invalid OTP. Please try again.';
         this.isLoading = false;
       }
@@ -225,14 +247,18 @@ export class ForgotPassword implements OnInit, OnDestroy {
   onPasswordSubmit(): void {
     if (this.passwordForm.invalid || this.isLoading) return;
 
+    console.log('🔒 Starting password reset for phone:', this.phoneNumber);
     this.isLoading = true;
     this.errorMessage = '';
 
     const newPassword = this.passwordControl?.value;
+    console.log('🔑 New password length:', newPassword?.length);
 
     const subscription = this.authService.resetPasswordWithPhone(this.phoneNumber, newPassword).subscribe({
       next: (success) => {
+        console.log('✅ Password reset result:', success);
         if (success) {
+          console.log('🎉 Password reset successful, redirecting to login');
           this.successMessage = 'Password reset successfully!';
           setTimeout(() => {
             this.router.navigate(['/login'], { 
@@ -243,7 +269,8 @@ export class ForgotPassword implements OnInit, OnDestroy {
         this.isLoading = false;
       },
       error: (error) => {
-        this.errorMessage = error.message || 'Failed to reset password. Please try again.';
+        console.error('❌ Password reset failed:', error);
+        this.errorMessage = error.message || error || 'Failed to reset password. Please try again.';
         this.isLoading = false;
       }
     });

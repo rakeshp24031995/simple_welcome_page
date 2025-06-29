@@ -205,8 +205,25 @@ export class MockOtpService {
    */
   async isPhoneNumberVerified(phoneNumber: string): Promise<boolean> {
     console.log('📞 [MOCK] Checking if phone verified:', phoneNumber);
-    // For demo, return false so users can always test registration
-    return false;
+    
+    // For demo purposes, simulate some registered users
+    // In real implementation, this would query the user database
+    const mockRegisteredPhones = [
+      '9876543210', // Test phone for forgot password
+      '9123456789', // Another test phone
+      '8888888888'  // Another test phone
+    ];
+    
+    const cleanPhone = phoneNumber.replace(/\D/g, '');
+    const isRegistered = mockRegisteredPhones.includes(cleanPhone);
+    
+    if (isRegistered) {
+      console.log('✅ [MOCK] Phone exists in mock database');
+    } else {
+      console.log('❌ [MOCK] Phone not found in mock database');
+    }
+    
+    return isRegistered;
   }
 
   /**
