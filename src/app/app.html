@@ -7,7 +7,7 @@
       <span class="text-white font-light tracking-wider ml-2">Lounge</span>
     </a>
     
-    <!-- Navigation Menu -->
+    <!-- Desktop Navigation Menu -->
     <ul class="hidden md:flex space-x-8 text-white">
       <li><a routerLink="/" fragment="home" class="hover:text-gold transition-colors duration-300">Home</a></li>
       <li><a routerLink="/" fragment="about" class="hover:text-gold transition-colors duration-300">About</a></li>
@@ -16,6 +16,19 @@
       <li><a routerLink="/" fragment="testimonials" class="hover:text-gold transition-colors duration-300">Reviews</a></li>
       <li><a routerLink="/" fragment="contact" class="hover:text-gold transition-colors duration-300">Contact</a></li>
     </ul>
+    
+    <!-- Mobile Menu Button -->
+    <button *ngIf="!(currentUser$ | async)" 
+            (click)="toggleMobileMenu($event)" 
+            class="md:hidden text-white p-2 hover:text-gold transition-colors duration-300"
+            aria-label="Toggle mobile menu">
+      <svg *ngIf="!showMobileMenu" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+      </svg>
+      <svg *ngIf="showMobileMenu" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
     
     <!-- Auth Buttons -->
     <div class="flex items-center space-x-4">
@@ -155,7 +168,7 @@
       
       <!-- Guest Buttons -->
       <ng-template #guestButtons>
-        <div class="flex items-center space-x-3">
+        <div class="hidden md:flex items-center space-x-3">
           <a routerLink="/login" class="text-white hover:text-gold transition-colors duration-300 font-semibold">
             Sign In
           </a>
@@ -167,6 +180,92 @@
     </div>
   </nav>
 </header>
+
+<!-- Mobile Menu Overlay -->
+<div *ngIf="showMobileMenu" 
+     class="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+     (click)="closeMobileMenu()">
+  <div class="fixed top-0 right-0 h-full w-80 bg-dark transform transition-transform duration-300 ease-in-out"
+       (click)="$event.stopPropagation()">
+    
+    <!-- Mobile Menu Header -->
+    <div class="flex items-center justify-between p-6 border-b border-gray-700">
+      <div class="text-xl font-bold">
+        <span class="text-white font-light tracking-wider">Clean</span>
+        <span class="text-gold font-black tracking-tight">Cut</span>
+        <span class="text-white font-light tracking-wider ml-2">Lounge</span>
+      </div>
+      <button (click)="closeMobileMenu()" 
+              class="text-white p-2 hover:text-gold transition-colors duration-300">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+    
+    <!-- Mobile Navigation Links -->
+    <nav class="p-6">
+      <ul class="space-y-4">
+        <li>
+          <a routerLink="/" fragment="home" 
+             (click)="closeMobileMenu()"
+             class="block py-3 px-4 text-white hover:text-gold hover:bg-gray-800 rounded-lg transition-all duration-300 text-lg font-medium">
+            Home
+          </a>
+        </li>
+        <li>
+          <a routerLink="/" fragment="about" 
+             (click)="closeMobileMenu()"
+             class="block py-3 px-4 text-white hover:text-gold hover:bg-gray-800 rounded-lg transition-all duration-300 text-lg font-medium">
+            About
+          </a>
+        </li>
+        <li>
+          <a routerLink="/" fragment="services" 
+             (click)="closeMobileMenu()"
+             class="block py-3 px-4 text-white hover:text-gold hover:bg-gray-800 rounded-lg transition-all duration-300 text-lg font-medium">
+            Services
+          </a>
+        </li>
+        <li>
+          <a routerLink="/" fragment="gallery" 
+             (click)="closeMobileMenu()"
+             class="block py-3 px-4 text-white hover:text-gold hover:bg-gray-800 rounded-lg transition-all duration-300 text-lg font-medium">
+            Gallery
+          </a>
+        </li>
+        <li>
+          <a routerLink="/" fragment="testimonials" 
+             (click)="closeMobileMenu()"
+             class="block py-3 px-4 text-white hover:text-gold hover:bg-gray-800 rounded-lg transition-all duration-300 text-lg font-medium">
+            Reviews
+          </a>
+        </li>
+        <li>
+          <a routerLink="/" fragment="contact" 
+             (click)="closeMobileMenu()"
+             class="block py-3 px-4 text-white hover:text-gold hover:bg-gray-800 rounded-lg transition-all duration-300 text-lg font-medium">
+            Contact
+          </a>
+        </li>
+      </ul>
+      
+      <!-- Mobile Auth Buttons -->
+      <div class="mt-8 space-y-4">
+        <a routerLink="/login" 
+           (click)="closeMobileMenu()"
+           class="block w-full py-3 px-4 text-center bg-transparent border-2 border-gold text-gold hover:bg-gold hover:text-dark transition-all duration-300 rounded-lg font-semibold">
+          Sign In
+        </a>
+        <a routerLink="/register" 
+           (click)="closeMobileMenu()"
+           class="block w-full py-3 px-4 text-center bg-gold text-dark hover:bg-yellow-400 transition-all duration-300 rounded-lg font-semibold">
+          Book Now
+        </a>
+      </div>
+    </nav>
+  </div>
+</div>
 
 <!-- Router Outlet for all pages -->
 <router-outlet />

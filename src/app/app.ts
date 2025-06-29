@@ -22,6 +22,7 @@ export class App implements OnInit {
   protected title = 'Clean Cut Lounge - Premium Indian Barbershop';
   currentUser$: Observable<User | null>;
   showUserMenu = false;
+  showMobileMenu = false;
   isHomePage = true;
 
   constructor(
@@ -59,11 +60,23 @@ export class App implements OnInit {
     this.showUserMenu = false;
   }
 
+  toggleMobileMenu(event: Event): void {
+    event.stopPropagation();
+    this.showMobileMenu = !this.showMobileMenu;
+  }
+
+  closeMobileMenu(): void {
+    this.showMobileMenu = false;
+  }
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event): void {
-    // Only close menu if we're not clicking on the menu itself
+    // Close menus if clicking outside
     if (this.showUserMenu) {
       this.showUserMenu = false;
+    }
+    if (this.showMobileMenu) {
+      this.showMobileMenu = false;
     }
   }
 

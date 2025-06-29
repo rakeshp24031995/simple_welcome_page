@@ -12,16 +12,16 @@
     </div>
 
     <!-- Services Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
       <div *ngFor="let service of services" class="bg-white rounded-2xl shadow-lg overflow-hidden card-hover border border-gray-100">
         <!-- Service Image -->
-        <div class="relative h-48 overflow-hidden">
+        <div class="relative h-48 sm:h-56 overflow-hidden">
           <img 
             [src]="service.image" 
             [alt]="service.name" 
             class="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
           >
-          <div class="absolute top-4 right-4 bg-gold text-dark px-3 py-1 rounded-full font-semibold text-sm">
+          <div class="absolute top-3 right-3 bg-gold text-dark px-2 py-1 sm:px-3 sm:py-1 rounded-full font-semibold text-xs sm:text-sm">
             {{ service.price }}
           </div>
         </div>
@@ -41,7 +41,7 @@
             </div>
           </div>
           
-          <a routerLink="/login" class="w-full bg-navy text-white py-3 rounded-lg font-semibold hover:bg-opacity-90 transition-all duration-300 block text-center">
+          <a routerLink="/login" class="w-full bg-navy text-white py-3 sm:py-4 rounded-lg font-semibold hover:bg-opacity-90 transition-all duration-300 block text-center min-h-[48px] flex items-center justify-center text-sm sm:text-base">
             Book Now
           </a>
         </div>
@@ -49,17 +49,19 @@
     </div>
 
     <!-- Popular Services Banner -->
-    <div class="mt-16 bg-gradient-to-r from-navy to-rust rounded-2xl p-8 text-center text-white">
-      <h3 class="text-2xl md:text-3xl font-bold mb-4">
-        Most Popular: <span class="text-gold">Complete Grooming Package</span>
+    <div class="mt-16 bg-gradient-to-r from-navy to-rust rounded-2xl p-6 sm:p-8 text-center text-white">
+      <h3 class="text-xl sm:text-2xl md:text-3xl font-bold mb-4 leading-tight">
+        Most Popular: <span class="text-gold block sm:inline">Complete Grooming Package</span>
       </h3>
-      <p class="text-lg mb-6 text-gray-200">
+      <p class="text-base sm:text-lg mb-6 text-gray-200 leading-relaxed px-2">
         Haircut + Beard Trim + Hot Towel Shave + Champi - Save 20%
       </p>
-      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-        <span class="text-3xl font-bold text-gold">₹499</span>
-        <span class="text-lg text-gray-300 line-through">₹620</span>
-        <a routerLink="/login" class="btn-primary bg-gold text-dark hover:bg-yellow-400">
+      <div class="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 justify-center items-center">
+        <div class="flex items-center space-x-3">
+          <span class="text-2xl sm:text-3xl font-bold text-gold">₹499</span>
+          <span class="text-base sm:text-lg text-gray-300 line-through">₹620</span>
+        </div>
+        <a routerLink="/login" class="btn-primary bg-gold text-dark hover:bg-yellow-400 w-full sm:w-auto min-w-[160px] py-3 sm:py-4 text-base font-semibold">
           Book Package
         </a>
       </div>
