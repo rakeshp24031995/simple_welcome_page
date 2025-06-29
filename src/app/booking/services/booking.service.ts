@@ -67,7 +67,26 @@ export class BookingService {
         },
         error: (error) => {
           console.error('Error creating booking:', error);
-          observer.error('Failed to create booking');
+          
+          let errorMessage = 'Failed to create booking. Please try again.';
+          
+          if (error.code) {
+            switch (error.code) {
+              case 'permission-denied':
+                errorMessage = 'You do not have permission to create bookings. Please contact support.';
+                break;
+              case 'network-request-failed':
+                errorMessage = 'Network error. Please check your connection and try again.';
+                break;
+              case 'unavailable':
+                errorMessage = 'Booking service is temporarily unavailable. Please try again later.';
+                break;
+              default:
+                errorMessage = `Booking failed: ${error.message || 'Unknown error'}`;
+            }
+          }
+          
+          observer.error(errorMessage);
         }
       });
     });

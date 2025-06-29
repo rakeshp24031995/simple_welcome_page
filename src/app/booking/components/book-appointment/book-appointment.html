@@ -22,7 +22,7 @@
             <select
               id="service"
               formControlName="service"
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent transition-all duration-300"
+              class="w-full px-4 py-4 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent transition-all duration-300 min-h-[48px]"
             >
               <option value="">Choose a service</option>
               <option value="haircut">Classic Haircut - ₹300</option>
@@ -49,7 +49,7 @@
               [min]="minDate"
               [max]="maxDate"
               (change)="onDateChange()"
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent transition-all duration-300"
+              class="w-full px-4 py-4 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent transition-all duration-300 min-h-[48px]"
             >
             <div *ngIf="bookingForm.get('date')?.invalid && bookingForm.get('date')?.touched" 
                  class="text-red-500 text-sm mt-1">

@@ -48,6 +48,9 @@ export class App implements OnInit {
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: NavigationEnd) => {
       this.isHomePage = event.url === '/' || event.url === '';
+      // Close mobile menu on route change
+      this.closeMobileMenu();
+      this.closeUserMenu();
     });
   }
 

@@ -44,16 +44,29 @@ export class FirebaseService {
     try {
       // Validate Firebase configuration
       if (!environment.firebase.apiKey || !environment.firebase.projectId) {
+        console.error('Firebase configuration missing:', {
+          hasApiKey: !!environment.firebase.apiKey,
+          hasProjectId: !!environment.firebase.projectId
+        });
         throw new Error('Firebase configuration is incomplete');
       }
+      
+      console.log('Initializing Firebase with project:', environment.firebase.projectId);
       
       // Initialize Firebase
       this.app = initializeApp(environment.firebase);
       this.auth = getAuth(this.app);
       this.firestore = getFirestore(this.app);
       
+      console.log('Firebase initialized successfully');
+      
       // Listen to auth state changes
       onAuthStateChanged(this.auth, (user) => {
+        if (user) {
+          console.log('User authenticated:', user.email);
+        } else {
+          console.log('User signed out');
+        }
         this.authStateSubject.next(user);
       });
     } catch (error) {

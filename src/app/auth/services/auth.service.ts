@@ -133,20 +133,27 @@ export class AuthService {
       }),
       catchError((error) => {
         this.isLoadingSubject.next(false);
+        console.error('Registration error:', error);
         let errorMessage = 'Registration failed';
         
         switch (error.code) {
           case 'auth/email-already-in-use':
-            errorMessage = 'Email is already registered';
+            errorMessage = 'This email is already registered. Please use a different email or try signing in.';
             break;
           case 'auth/invalid-email':
-            errorMessage = 'Invalid email address';
+            errorMessage = 'Please enter a valid email address.';
             break;
           case 'auth/weak-password':
-            errorMessage = 'Password is too weak';
+            errorMessage = 'Password must be at least 6 characters long.';
+            break;
+          case 'auth/network-request-failed':
+            errorMessage = 'Network error. Please check your connection and try again.';
+            break;
+          case 'auth/operation-not-allowed':
+            errorMessage = 'Registration is currently disabled. Please contact support.';
             break;
           default:
-            errorMessage = error.message || 'Registration failed';
+            errorMessage = error.message || 'Registration failed. Please try again.';
         }
         
         return throwError(() => errorMessage);

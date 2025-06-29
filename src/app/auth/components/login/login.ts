@@ -37,6 +37,13 @@ export class Login implements OnInit {
     this.showPassword = !this.showPassword;
   }
 
+  fillDemoCredentials(): void {
+    this.loginForm.patchValue({
+      email: 'admin@cleancutlounge.com',
+      password: 'admin123'
+    });
+  }
+
   onSubmit(): void {
     if (this.loginForm.valid) {
       this.isLoading = true;
