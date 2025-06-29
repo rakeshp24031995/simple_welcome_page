@@ -167,12 +167,13 @@
       
       <!-- Guest Buttons -->
       <ng-template #guestButtons>
-        <div class="hidden md:flex items-center space-x-3 h-full">
-          <a routerLink="/login" class="flex items-center h-full text-white hover:text-gold transition-colors duration-300 font-semibold">
+        <div class="flex items-center space-x-3 h-full">
+          <a routerLink="/login" class="hidden sm:flex items-center h-full text-white hover:text-gold transition-colors duration-300 font-semibold">
             Sign In
           </a>
-          <a routerLink="/register" class="btn-primary flex items-center">
-            Book Now
+          <a routerLink="/register" class="btn-primary flex items-center text-xs sm:text-sm px-3 sm:px-6 py-2 sm:py-3">
+            <span class="hidden sm:inline">Book Now</span>
+            <span class="sm:hidden">Book</span>
           </a>
         </div>
       </ng-template>
