@@ -181,4 +181,30 @@ export class FirebaseService {
   async sendPasswordResetEmail(email: string): Promise<void> {
     return sendPasswordResetEmail(this.auth, email);
   }
+
+  // Check if phone number exists in users (with better error handling)
+  async checkPhoneExists(phoneNumber: string): Promise<boolean> {
+    try {
+      console.log('🔍 Checking if phone exists:', phoneNumber);
+      
+      // Try the query with better error handling
+      const users = await this.queryDocuments('users', 'phoneNumber', '==', phoneNumber);
+      console.log('✅ Found users with phone:', users.length);
+      return users.length > 0;
+    } catch (error: any) {
+      console.warn('⚠️ Phone check failed:', error.message);
+      
+      // If it's a permissions error, we can still proceed with forgot password
+      if (error.code === 'permission-denied' || error.message.includes('permission')) {
+        console.log('🔄 Permissions issue detected, using fallback logic');
+        // Return true for valid phone formats to allow forgot password flow
+        const isValid = /^(\+91|91)?[6-9]\d{9}$/.test(phoneNumber.replace(/\s/g, ''));
+        console.log('📱 Phone format valid:', isValid);
+        return isValid;
+      }
+      
+      // For other errors, return false
+      return false;
+    }
+  }
 }

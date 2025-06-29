@@ -1,0 +1,68 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users collection rules
+    match /users/{userId} {
+      // Allow users to read and write their own document
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      // Allow authenticated users to read user documents for phone verification
+      // This is needed for forgot password flow
+      allow read: if request.auth != null;
+      
+      // Allow creation during registration (when user is authenticated)
+      allow create: if request.auth != null;
+    }
+    
+    // Allow authenticated users to query users collection by phone number
+    // This is specifically for forgot password functionality
+    match /users/{document=**} {
+      allow read: if request.auth != null;
+    }
+    
+    // Appointments collection rules
+    match /appointments/{appointmentId} {
+      // Allow authenticated users to read/write appointments
+      allow read, write: if request.auth != null;
+      
+      // Allow customers to read their own appointments
+      allow read: if request.auth != null && 
+                     request.auth.uid == resource.data.customerId;
+      
+      // Allow customers to create appointments
+      allow create: if request.auth != null;
+      
+      // Allow owners/admins to manage all appointments
+      allow read, write: if request.auth != null && 
+                           exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+                           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['owner', 'admin'];
+    }
+    
+    // Services collection rules
+    match /services/{serviceId} {
+      // Allow everyone to read services (for public display)
+      allow read: if true;
+      
+      // Only owners/admins can manage services
+      allow write: if request.auth != null && 
+                      exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+                      get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['owner', 'admin'];
+    }
+    
+    // Settings collection rules (for app configuration)
+    match /settings/{settingId} {
+      // Allow everyone to read settings
+      allow read: if true;
+      
+      // Only admins can modify settings
+      allow write: if request.auth != null && 
+                      exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+                      get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Default rule: deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

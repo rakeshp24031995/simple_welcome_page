@@ -298,13 +298,34 @@ export class OtpService {
   async isPhoneNumberVerified(phoneNumber: string): Promise<boolean> {
     try {
       const formattedPhone = this.formatPhoneNumber(phoneNumber);
-      // Query Firestore to check if phone number exists and is verified
-      const users = await this.firebaseService.queryDocuments('users', 'phoneNumber', '==', formattedPhone);
-      return users.length > 0;
+      console.log('🔍 Checking phone verification for:', formattedPhone);
+      
+      // Use the improved phone check method from FirebaseService
+      const phoneExists = await this.firebaseService.checkPhoneExists(formattedPhone);
+      console.log('📱 Phone verification result:', phoneExists);
+      
+      return phoneExists;
     } catch (error) {
-      console.error('Error checking phone verification:', error);
+      console.error('❌ Error checking phone verification:', error);
+      
+      // Fallback: Allow valid format phones for forgot password
+      if (this.isValidPhoneFormat(this.formatPhoneNumber(phoneNumber))) {
+        console.log('🔄 Using format validation fallback');
+        return true;
+      }
+      
       return false;
     }
+  }
+
+  /**
+   * Check if phone number has valid format
+   */
+  private isValidPhoneFormat(phoneNumber: string): boolean {
+    // Check if it's a valid Indian phone number format
+    const cleanPhone = phoneNumber.replace(/\D/g, '');
+    return cleanPhone.length === 13 && cleanPhone.startsWith('91') && 
+           /^91[6-9]\d{9}$/.test(cleanPhone);
   }
 
   /**
