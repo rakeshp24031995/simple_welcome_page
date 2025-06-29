@@ -164,11 +164,6 @@ export class FirebaseService {
     return new Date(timestamp);
   }
 
-  // Get current authenticated user
-  getCurrentUser(): FirebaseUser | null {
-    return this.auth.currentUser;
-  }
-
   // Get Auth instance for OTP service
   getAuth(): Auth {
     return this.auth;

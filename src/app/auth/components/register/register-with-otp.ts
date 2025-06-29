@@ -94,6 +94,35 @@ export class RegisterWithOtp implements OnInit, OnDestroy {
     return this.steps.find(step => step.step === this.currentStep) || this.steps[0];
   }
 
+  // Helper methods for template
+  getStepIndex(step: string): number {
+    return this.steps.findIndex(s => s.step === step);
+  }
+
+  getCurrentStepIndex(): number {
+    return this.steps.findIndex(s => s.step === this.currentStep);
+  }
+
+  getStepClasses(step: RegistrationStep, index: number): string {
+    const currentIndex = this.getCurrentStepIndex();
+    if (this.currentStep === step.step) {
+      return 'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium bg-gold text-dark';
+    } else if (currentIndex > index) {
+      return 'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium bg-green-500 text-white';
+    } else {
+      return 'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium bg-gray-200 text-gray-500';
+    }
+  }
+
+  getConnectorClasses(index: number): string {
+    const currentIndex = this.getCurrentStepIndex();
+    return currentIndex > index ? 'w-8 h-0.5 mx-2 bg-green-500' : 'w-8 h-0.5 mx-2 bg-gray-200';
+  }
+
+  isStepCompleted(index: number): boolean {
+    return this.getCurrentStepIndex() > index;
+  }
+
   get displayNameControl() {
     return this.registerForm.get('displayName');
   }

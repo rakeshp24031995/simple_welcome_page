@@ -14,19 +14,14 @@
       <div class="flex items-center space-x-4">
         <div *ngFor="let step of steps; let i = index" class="flex items-center">
           <div class="flex items-center">
-            <div [class]="'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ' + 
-                         (currentStep === step.step ? 'bg-gold text-dark' : 
-                          steps.findIndex(s => s.step === currentStep) > i ? 'bg-green-500 text-white' : 
-                          'bg-gray-200 text-gray-500')">
-              <svg *ngIf="steps.findIndex(s => s.step === currentStep) > i" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div [class]="getStepClasses(step, i)">
+              <svg *ngIf="isStepCompleted(i)" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
               </svg>
-              <span *ngIf="steps.findIndex(s => s.step === currentStep) <= i">{{ i + 1 }}</span>
+              <span *ngIf="!isStepCompleted(i)">{{ i + 1 }}</span>
             </div>
           </div>
-          <div *ngIf="i < steps.length - 1" 
-               [class]="'w-8 h-0.5 mx-2 ' + 
-                        (steps.findIndex(s => s.step === currentStep) > i ? 'bg-green-500' : 'bg-gray-200')">
+          <div *ngIf="i < steps.length - 1" [class]="getConnectorClasses(i)">
           </div>
         </div>
       </div>
