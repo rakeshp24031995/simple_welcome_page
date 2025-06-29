@@ -7,6 +7,7 @@ import { Subscription } from 'rxjs';
 import { AdaptiveOtpService } from '../../services/adaptive-otp.service';
 import { AuthService } from '../../services/auth.service';
 import { OtpInput } from '../../../shared/components/otp-input/otp-input';
+import { environment } from '../../../../environments/environment';
 
 interface ResetStep {
   step: 'phone' | 'otp' | 'password';
@@ -31,6 +32,11 @@ export class ForgotPassword implements OnInit, OnDestroy {
   successMessage: string = '';
   
   private subscriptions = new Subscription();
+
+  // Environment access for template
+  get isPhoneBypassEnabled(): boolean {
+    return environment.bypassPhoneVerification || false;
+  }
 
   steps: ResetStep[] = [
     {

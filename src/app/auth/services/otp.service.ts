@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, from, throwError, BehaviorSubject } from 'rxjs';
 import { FirebaseService } from '../../core/services/firebase.service';
+import { environment } from '../../../environments/environment';
 import { 
   Auth, 
   RecaptchaVerifier, 
@@ -300,21 +301,46 @@ export class OtpService {
       const formattedPhone = this.formatPhoneNumber(phoneNumber);
       console.log('🔍 Checking phone verification for:', formattedPhone);
       
-      // Use the improved phone check method from FirebaseService
-      const phoneExists = await this.firebaseService.checkPhoneExists(formattedPhone);
-      console.log('📱 Phone verification result:', phoneExists);
-      
-      return phoneExists;
-    } catch (error) {
-      console.error('❌ Error checking phone verification:', error);
-      
-      // Fallback: Allow valid format phones for forgot password
-      if (this.isValidPhoneFormat(this.formatPhoneNumber(phoneNumber))) {
-        console.log('🔄 Using format validation fallback');
-        return true;
+      // Check for bypass mode in environment
+      if (environment.bypassPhoneVerification) {
+        console.log('🚫 Phone verification bypass enabled - validating format only');
+        const isValidFormat = this.isValidPhoneFormat(formattedPhone);
+        console.log('📱 Phone format validation result:', isValidFormat);
+        return isValidFormat;
       }
       
-      return false;
+      // Try normal phone verification
+      try {
+        const phoneExists = await this.firebaseService.checkPhoneExists(formattedPhone);
+        console.log('✅ Phone verification successful:', phoneExists);
+        return phoneExists;
+      } catch (firestoreError: any) {
+        console.error('❌ Firestore phone check failed:', firestoreError);
+        
+        // If permissions error, fall back to format validation
+        if (firestoreError.code === 'permission-denied' || 
+            firestoreError.message?.includes('permission') ||
+            firestoreError.message?.includes('insufficient')) {
+          
+          console.log('🔄 Permissions error detected, using format validation');
+          const isValidFormat = this.isValidPhoneFormat(formattedPhone);
+          console.log('📱 Format validation result:', isValidFormat);
+          return isValidFormat;
+        }
+        
+        // For other errors, still try format validation
+        const isValidFormat = this.isValidPhoneFormat(formattedPhone);
+        console.log('🔄 Using format validation due to error:', isValidFormat);
+        return isValidFormat;
+      }
+    } catch (error) {
+      console.error('❌ Unexpected error in phone verification:', error);
+      
+      // Final fallback: Allow valid format phones
+      const formattedPhone = this.formatPhoneNumber(phoneNumber);
+      const isValidFormat = this.isValidPhoneFormat(formattedPhone);
+      console.log('🆘 Final fallback - format validation:', isValidFormat);
+      return isValidFormat;
     }
   }
 
